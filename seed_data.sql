@@ -1,8 +1,3 @@
--- ═══════════════════════════════════════════════════════════════
---  CampusSwap — Demo Seed Data
---  Run once on your MySQL database to populate sample data.
---  Command: mysql -u root -p college_marketplace < seed_data.sql
--- ═══════════════════════════════════════════════════════════════
 
 -- ── Categories ──────────────────────────────────────────────────
 INSERT IGNORE INTO Category (CategoryName) VALUES
@@ -176,8 +171,3 @@ SET Rating = (
     WHERE RevieweeID = Student.StudentID
 )
 WHERE StudentID IN (@alex, @maria, @kevin, @priya, @marcus);
-
--- ═══════════════════════════════════════════════════════════════
---  Done! Visit http://localhost:5000 to see the seeded data.
---  Login with any email above, password: pass123
--- ═══════════════════════════════════════════════════════════════

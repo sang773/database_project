@@ -8,7 +8,6 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'campusswap_secret_2024'
 
-# Always resolve relative to app.py's directory so saves work regardless of CWD
 UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads', 'listings')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -87,7 +86,7 @@ def _create_tables():
 try:
     _create_tables()
 except Exception:
-    pass  # DB may not be ready at import time
+    pass  
 
 # ─────────────────────────────────────────
 #  WATCHED SET HELPER
@@ -245,7 +244,7 @@ def search():
     used_fulltext = False
 
     if q:
-        # ── Full-text search (MATCH AGAINST) ──
+
         try:
             ft_select = _LISTING_SELECT.replace(
                 "FROM Listing l",
@@ -373,7 +372,7 @@ def price_suggestion():
     db  = get_db()
     cur = db.cursor(dictionary=True)
 
-    # ── Step 1: Title keyword match (most accurate — item-specific) ──
+
     if len(raw_title) >= 3:
         for kw in _extract_keywords(raw_title)[:3]:
             like = f'%{kw}%'
