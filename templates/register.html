@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Register — CampusSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+body { display:flex; min-height:100vh; }
+.auth-split { display:flex; width:100%; min-height:100vh; }
+.auth-left {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:60px 48px; position:relative; overflow:hidden;
+  background:var(--bg1); border-right:1px solid var(--border);
+}
+.auth-left-mesh {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 25% 55%, rgba(123,110,246,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 65% at 75% 30%, rgba(200,245,102,.07) 0%,transparent 55%);
+}
+.auth-left-content { position:relative; z-index:2; max-width:400px; }
+.auth-brand {
+  font-family:'DM Serif Display',serif; font-size:2rem;
+  margin-bottom:36px; display:flex; align-items:center; gap:10px;
+}
+.auth-brand-dot { width:10px;height:10px; background:var(--accent); border-radius:50%; animation:livepulse 2s infinite; }
+.auth-tagline { font-family:'DM Serif Display',serif; font-size:2.5rem; line-height:1.1; margin-bottom:20px; }
+.auth-tagline em { font-style:italic; color:var(--accent); }
+.auth-left p { font-size:.95rem; color:var(--text2); line-height:1.75; margin-bottom:32px; }
+.step-list { display:flex; flex-direction:column; gap:12px; counter-reset:steps; }
+.step-item {
+  display:flex; align-items:center; gap:14px;
+  padding:16px 18px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--radius);
+}
+.step-num {
+  width:32px;height:32px; border-radius:50%;
+  background:rgba(200,245,102,.12); border:1px solid rgba(200,245,102,.25);
+  color:var(--accent); font-weight:700; font-size:.85rem;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.step-text strong { display:block; font-size:.88rem; font-weight:600; margin-bottom:2px; }
+.step-text span { font-size:.78rem; color:var(--text2); }
+
+.auth-right {
+  width:500px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  padding:60px 48px; background:var(--bg);
+}
+.auth-form-wrap { width:100%; max-width:400px; }
+.auth-form-title { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:6px; }
+.auth-form-sub { font-size:.88rem; color:var(--text2); margin-bottom:36px; }
+.auth-form-sub a { color:var(--accent); text-decoration:none; font-weight:600; }
+.error-box {
+  background:rgba(255,92,92,.08); border:1px solid rgba(255,92,92,.2);
+  color:var(--red); border-radius:var(--radius); padding:12px 16px;
+  font-size:.85rem; margin-bottom:18px;
+}
+@media(max-width:900px){
+  .auth-left{display:none;}
+  .auth-right{width:100%;padding:48px 24px;}
+}
+</style>
+</head>
+<body>
+<div class="auth-split">
+
+  <!-- LEFT -->
+  <div class="auth-left">
+    <div class="auth-left-mesh"></div>
+    <div class="auth-left-content">
+      <div class="auth-brand"><span class="auth-brand-dot"></span>CampusSwap</div>
+      <h1 class="auth-tagline">Join your campus <em>marketplace</em>.</h1>
+      <p>Create your free account in under a minute and start buying or selling today.</p>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <strong>Create your account</strong>
+            <span>Use your university email address.</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <strong>Post or browse listings</strong>
+            <span>Find deals or list your items instantly.</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <strong>Message &amp; meet on campus</strong>
+            <span>Safe, easy, student-to-student transactions.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <h2 class="auth-form-title">Create account</h2>
+      <p class="auth-form-sub">Already have one? <a href="/login">Login here</a></p>
+
+      {% if error %}
+      <div class="error-box">⚠ {{ error }}</div>
+      {% endif %}
+
+      <form method="POST">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" type="text" name="name" placeholder="John Smith" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">University Email</label>
+          <input class="form-input" type="email" name="email" placeholder="you@university.edu" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" name="password" placeholder="Create a password" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">University</label>
+          <input class="form-input" type="text" name="university" placeholder="Georgia Tech" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="padding:13px;font-size:.95rem;border-radius:var(--radius);">
+          Create Account →
+        </button>
+        <p style="font-size:.75rem;color:var(--text3);text-align:center;margin-top:14px;">
+          By registering you agree to our terms. Student email required.
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

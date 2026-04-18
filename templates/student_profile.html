@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ seller.Name }} — CampusSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+.mini-nav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(8,8,16,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);z-index:200;}
+.mini-nav-logo{font-family:'DM Serif Display',serif;font-size:1.5rem;text-decoration:none;color:var(--text);}
+.page-wrap{max-width:1100px;margin:0 auto;padding:96px 48px 80px;}
+
+.profile-header{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:40px 44px;display:flex;align-items:center;gap:32px;margin-bottom:36px;position:relative;overflow:hidden;}
+.profile-header::before{content:'';position:absolute;top:0;right:0;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(200,245,102,.06) 0%,transparent 70%);transform:translate(30%,-30%);}
+.avatar{width:84px;height:84px;border-radius:22px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:2.2rem;color:#0a0f00;flex-shrink:0;}
+.seller-name{font-family:'DM Serif Display',serif;font-size:1.9rem;margin-bottom:5px;}
+.seller-meta{font-size:.85rem;color:var(--text2);margin-bottom:4px;}
+.seller-uni{font-size:.82rem;color:var(--text3);}
+.stat-row{display:flex;gap:32px;margin-top:20px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-n{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--accent);display:block;}
+.stat-l{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+
+.section-title{font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400;margin:36px 0 20px;}
+.listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.lcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all .25s;text-decoration:none;color:var(--text);display:block;}
+.lcard:hover{transform:translateY(-5px);border-color:rgba(200,245,102,.2);}
+.lcard-img{height:120px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;}
+.lcard-body{padding:16px 18px;}
+.lcard-cat{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+.lcard-title{font-family:'DM Serif Display',serif;font-size:.97rem;margin-bottom:8px;line-height:1.25;}
+.lcard-foot{display:flex;align-items:center;justify-content:space-between;}
+.lcard-price{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--accent);}
+
+.review-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:12px;}
+.rv-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.rv-name{font-weight:700;font-size:.88rem;}
+.rv-stars{color:var(--accent3);font-size:.9rem;}
+.rv-comment{color:var(--text2);font-size:.86rem;line-height:1.7;font-style:italic;}
+.rv-date{font-size:.7rem;color:var(--text3);margin-top:6px;}
+
+.empty{text-align:center;padding:48px;color:var(--text2);}
+@media(max-width:900px){.mini-nav{padding:0 20px;}.page-wrap{padding:80px 20px 60px;}.profile-header{flex-direction:column;text-align:center;}.stat-row{justify-content:center;}}
+</style>
+</head>
+<body>
+
+<nav class="mini-nav">
+  <a href="/" class="mini-nav-logo">CampusSwap</a>
+  <div style="display:flex;gap:10px;">
+    <a href="/" class="btn btn-ghost btn-sm">← Browse</a>
+    {% if session.name %}
+      <a href="/profile" class="btn btn-ghost btn-sm">My Profile</a>
+    {% else %}
+      <a href="/login" class="btn btn-ghost btn-sm">Login</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- SELLER HEADER -->
+  <div class="profile-header">
+    <div class="avatar">{{ seller.Name[0] }}</div>
+    <div style="flex:1;">
+      <div class="seller-name">{{ seller.Name }}</div>
+      <div class="seller-meta">
+        ⭐ {{ seller.Rating or '—' }}/5.0 rating
+        {% if reviews %}&nbsp;·&nbsp;{{ reviews|length }} review{{ 's' if reviews|length != 1 }}{% endif %}
+      </div>
+      <div class="seller-uni">📍 {{ seller.University }} &nbsp;·&nbsp; Member since {{ seller.JoinDate }}</div>
+      <div class="stat-row">
+        <div class="stat">
+          <span class="stat-n">{{ listings|length }}</span>
+          <span class="stat-l">Active Listings</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n">{{ stats.total_sales or 0 }}</span>
+          <span class="stat-l">Items Sold</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n">{{ seller.Rating or '—' }}</span>
+          <span class="stat-l">Avg Rating</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n">{{ reviews|length }}</span>
+          <span class="stat-l">Reviews</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE LISTINGS -->
+  <div class="section-title">Active Listings ({{ listings|length }})</div>
+  {% if listings %}
+  <div class="listings-grid">
+    {% for l in listings %}
+    <a href="/listing/{{ l.ListingID }}" class="lcard">
+      <div class="lcard-img cat-bg-{{ (loop.index % 6) + 1 }}">
+        {% if l.PrimaryImage %}
+          <img src="/static/{{ l.PrimaryImage }}" alt="{{ l.Title }}"
+               style="width:100%;height:100%;object-fit:cover;">
+        {% elif l.CategoryName=='Textbooks' %}📚
+        {% elif l.CategoryName=='Electronics' %}📱
+        {% elif l.CategoryName=='Furniture' %}🛋️
+        {% elif l.CategoryName=='Clothes' %}👕
+        {% elif l.CategoryName=='Sports' %}⚽
+        {% elif l.CategoryName=='Appliances' %}☕
+        {% else %}📦{% endif %}
+      </div>
+      <div class="lcard-body">
+        <div class="lcard-cat">{{ l.CategoryName }}</div>
+        <div class="lcard-title">{{ l.Title }}</div>
+        <div class="lcard-foot">
+          <div class="lcard-price">${{ l.Price }}</div>
+          {% if l.DealScore == 'Hot' %}
+            <span class="badge badge-green" style="font-size:.62rem;">🔥 Hot</span>
+          {% endif %}
+          {% if l.Condition == 'Like New' %}
+            <span class="badge badge-green">Like New</span>
+          {% elif l.Condition == 'Good' %}
+            <span class="badge badge-amber">Good</span>
+          {% else %}
+            <span class="badge badge-muted">Fair</span>
+          {% endif %}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">No active listings at this time.</div>
+  {% endif %}
+
+  <!-- REVIEWS -->
+  <div class="section-title">Reviews ({{ reviews|length }})</div>
+  {% if reviews %}
+    {% for r in reviews %}
+    <div class="review-card">
+      <div class="rv-header">
+        <span class="rv-name">{{ r.ReviewerName }}</span>
+        <span class="rv-stars">{{ '★' * r.Rating }}{{ '☆' * (5 - r.Rating) }}</span>
+      </div>
+      <div class="rv-comment">"{{ r.Comment }}"</div>
+      <div class="rv-date">{{ r.Date }}</div>
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="empty">No reviews yet.</div>
+  {% endif %}
+
+</div>
+</body>
+</html>

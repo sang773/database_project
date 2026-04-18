@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Post a Listing — CampusSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+.page-wrap {
+  max-width:700px; margin:0 auto;
+  padding:100px 24px 80px;
+}
+.page-header { margin-bottom:40px; }
+.page-header h1 { font-family:'DM Serif Display',serif; font-size:2.4rem; font-weight:400; margin-bottom:8px; }
+.page-header p { color:var(--text2); font-size:.95rem; }
+.form-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--radius-xl); padding:40px;
+}
+
+/* Smart Price Suggester */
+.price-box {
+  margin-top:10px;
+  background:rgba(200,245,102,.06);
+  border:1px solid rgba(200,245,102,.18);
+  border-radius:var(--radius); padding:16px 20px;
+  display:none;
+  animation:fadein .3s ease;
+}
+.price-box.show { display:block; }
+@keyframes fadein { from{opacity:0;transform:translateY(-6px);} to{opacity:1;transform:translateY(0);} }
+.price-box-title {
+  font-size:.75rem; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:12px;
+  display:flex; align-items:center; gap:8px;
+}
+.price-stats { display:flex; gap:24px; flex-wrap:wrap; }
+.pstat { text-align:center; }
+.pstat-n { font-family:'DM Serif Display',serif; font-size:1.5rem; color:var(--accent); display:block; }
+.pstat-l { font-size:.7rem; color:var(--text2); text-transform:uppercase; letter-spacing:.06em; }
+.price-note { font-size:.78rem; color:var(--text2); margin-top:10px; }
+.price-loading { font-size:.82rem; color:var(--text2); display:none; align-items:center; gap:8px; margin-top:10px; }
+.price-loading.show { display:flex; }
+.spinner {
+  width:14px;height:14px; border:2px solid var(--border2);
+  border-top-color:var(--accent); border-radius:50%;
+  animation:spin .6s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg);} }
+
+/* Image Upload Zone */
+.upload-zone {
+  border:2px dashed var(--border2);border-radius:var(--radius);
+  padding:32px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;margin-top:8px;
+}
+.upload-zone:hover,.upload-zone.drag-over {
+  border-color:rgba(200,245,102,.5);
+  background:rgba(200,245,102,.04);
+}
+.upload-zone p { color:var(--text2);font-size:.85rem;margin:0;pointer-events:none; }
+.upload-zone strong { color:var(--accent);font-weight:600; }
+.img-preview { display:flex;flex-wrap:wrap;gap:10px;margin-top:14px; }
+.img-thumb {
+  position:relative;width:80px;height:80px;
+  border-radius:8px;overflow:hidden;border:1px solid var(--border2);
+}
+.img-thumb img { width:100%;height:100%;object-fit:cover; }
+.img-remove {
+  position:absolute;top:3px;right:3px;
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(0,0,0,.7);border:none;color:#fff;
+  font-size:11px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Nav */
+.mini-nav {
+  position:fixed; top:0;left:0;right:0;
+  height:64px; display:flex; align-items:center;
+  justify-content:space-between; padding:0 48px;
+  background:rgba(8,8,16,.92); backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border); z-index:200;
+}
+.mini-nav-logo {
+  font-family:'DM Serif Display',serif; font-size:1.5rem;
+  text-decoration:none; color:var(--text);
+}
+
+@media(max-width:600px){
+  .mini-nav{padding:0 20px;}
+  .form-card{padding:24px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="mini-nav">
+  <a href="/" class="mini-nav-logo">CampusSwap</a>
+  <div style="display:flex;gap:10px;">
+    <a href="/" class="btn btn-ghost btn-sm">← Browse</a>
+    <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div class="section-eyebrow">New Listing</div>
+    <h1>Post an Item for Sale</h1>
+    <p>Fill in the details below. Our Smart Price Suggester will recommend the best price for you.</p>
+  </div>
+
+  <div class="form-card">
+    <form method="POST" enctype="multipart/form-data">
+
+      <div class="form-group">
+        <label class="form-label">Item Title</label>
+        <input class="form-input" type="text" name="title" id="titleInput"
+               placeholder="e.g. Calculus Textbook" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" name="category_id" id="catSelect" onchange="fetchPrice()">
+            {% for cat in categories %}
+              <option value="{{ cat.CategoryID }}">
+                {% if cat.CategoryName=='Textbooks' %}📚{% elif cat.CategoryName=='Electronics' %}📱
+                {% elif cat.CategoryName=='Furniture' %}🛋️{% elif cat.CategoryName=='Clothes' %}👕
+                {% elif cat.CategoryName=='Sports' %}⚽{% elif cat.CategoryName=='Appliances' %}☕
+                {% else %}📦{% endif %}
+                {{ cat.CategoryName }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Condition</label>
+          <select class="form-select" name="condition">
+            <option>Like New</option>
+            <option>Good</option>
+            <option>Fair</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Your Price ($)</label>
+        <input class="form-input" type="number" name="price" id="priceInput"
+               placeholder="0.00" step="0.01" min="0" required>
+
+        <!-- Loading indicator -->
+        <div class="price-loading" id="priceLoading">
+          <div class="spinner"></div>
+          <span>Analyzing past sales data…</span>
+        </div>
+
+        <!-- Smart Price Suggester box -->
+        <div class="price-box" id="priceBox">
+          <div class="price-box-title">
+            💡 Smart Price Suggestion
+            <span id="priceSource" style="font-weight:400;opacity:.7;"></span>
+          </div>
+          <div class="price-stats">
+            <div class="pstat">
+              <span class="pstat-n" id="avgP">—</span>
+              <span class="pstat-l">Average</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-n" id="minP">—</span>
+              <span class="pstat-l">Lowest</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-n" id="maxP">—</span>
+              <span class="pstat-l">Highest</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-n" id="totalP">—</span>
+              <span class="pstat-l">Sales</span>
+            </div>
+          </div>
+          <p class="price-note" id="priceNote"></p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" name="description" rows="4"
+                  placeholder="Describe your item — age, condition details, any defects, why you're selling…" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Photos <span style="color:var(--text3);font-weight:400;">(optional, up to 5)</span></label>
+        <div class="upload-zone" id="uploadZone">
+          <p>📷 <strong>Click to upload</strong> or drag &amp; drop photos here</p>
+          <p style="margin-top:6px;font-size:.78rem;">PNG, JPG, WEBP up to 5 images</p>
+        </div>
+        <div class="img-preview" id="imagePreview"></div>
+        <input type="file" name="images" id="imageFiles"
+               accept="image/*" multiple style="display:none;">
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button type="submit" class="btn btn-primary" style="flex:1;padding:13px;font-size:.95rem;border-radius:var(--radius);">
+          Post Listing ✨
+        </button>
+        <a href="/" class="btn btn-ghost" style="padding:13px 24px;border-radius:var(--radius);">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+// ── Smart Price Suggester ──
+let _priceTimer = null;
+function fetchPrice() {
+  const catId = document.getElementById('catSelect').value;
+  const title = (document.getElementById('titleInput').value || '').trim();
+  const box   = document.getElementById('priceBox');
+  const loading = document.getElementById('priceLoading');
+  box.classList.remove('show');
+  loading.classList.add('show');
+
+  fetch(`/price_suggestion?category_id=${catId}&title=${encodeURIComponent(title)}`)
+    .then(r => r.json())
+    .then(d => {
+      loading.classList.remove('show');
+      if (d.avg) {
+        document.getElementById('avgP').textContent   = '$' + d.avg;
+        document.getElementById('minP').textContent   = '$' + (d.min_p || '—');
+        document.getElementById('maxP').textContent   = '$' + (d.max_p || '—');
+        document.getElementById('totalP').textContent = d.total;
+
+        let src, note;
+        if (d.source === 'item_sold') {
+          src  = `(${d.total} sale${d.total==1?'':'s'} matching "${d.match_key}")`;
+          note = `Based on ${d.total} completed sale${d.total==1?'':'s'} of similar "${d.match_key}" items — much more accurate than category average!`;
+        } else if (d.source === 'item_active') {
+          src  = `(${d.total} listing${d.total==1?'':'s'} matching "${d.match_key}")`;
+          note = `Based on ${d.total} similar "${d.match_key}" listing${d.total==1?'':'s'} currently active.`;
+        } else if (d.source === 'sold') {
+          src  = '(based on category sales)';
+          note = `Category average from ${d.total} completed sale${d.total==1?'':'s'}. Add a more specific title for a better estimate!`;
+        } else {
+          src  = '(based on active listings)';
+          note = `No completed sales yet — based on ${d.total} active listing${d.total==1?'':'s'}. Price competitively!`;
+        }
+        document.getElementById('priceSource').textContent = src;
+        document.getElementById('priceNote').textContent   = note;
+        if (!document.getElementById('priceInput').value) {
+          document.getElementById('priceInput').value = d.avg;
+        }
+      } else {
+        document.getElementById('avgP').textContent   = '—';
+        document.getElementById('minP').textContent   = '—';
+        document.getElementById('maxP').textContent   = '—';
+        document.getElementById('totalP').textContent = '0';
+        document.getElementById('priceSource').textContent = '(no data yet)';
+        document.getElementById('priceNote').textContent   =
+          'No listings in this category yet. Set a fair price based on condition!';
+      }
+      box.classList.add('show');
+    })
+    .catch(() => loading.classList.remove('show'));
+}
+
+// Debounce title input so we don't spam the server
+document.getElementById('titleInput').addEventListener('input', () => {
+  clearTimeout(_priceTimer);
+  _priceTimer = setTimeout(fetchPrice, 500);
+});
+
+window.addEventListener('load', fetchPrice);
+
+// ── Image Upload Zone ──
+const zone      = document.getElementById('uploadZone');
+const fileInput = document.getElementById('imageFiles');
+const preview   = document.getElementById('imagePreview');
+
+zone.addEventListener('click', () => fileInput.click());
+zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag-over');
+  try {
+    const dt = new DataTransfer();
+    [...e.dataTransfer.files].filter(f => f.type.startsWith('image/')).slice(0, 5)
+      .forEach(f => dt.items.add(f));
+    fileInput.files = dt.files;
+  } catch (_) { fileInput.click(); return; }
+  showPreviews([...fileInput.files]);
+});
+fileInput.addEventListener('change', () => showPreviews([...fileInput.files]));
+
+function showPreviews(files) {
+  preview.innerHTML = '';
+  files.slice(0, 5).forEach(f => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const d = document.createElement('div');
+      d.className = 'img-thumb';
+      d.innerHTML = `<img src="${ev.target.result}" alt="">`;
+      preview.appendChild(d);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+</script>
+</body>
+</html>

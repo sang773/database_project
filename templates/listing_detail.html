@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ listing.Title }} — CampusSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+.mini-nav {
+  position:fixed;top:0;left:0;right:0;height:64px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 48px;
+  background:rgba(8,8,16,.92);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);z-index:200;
+}
+.mini-nav-logo{font-family:'DM Serif Display',serif;font-size:1.5rem;text-decoration:none;color:var(--text);}
+.mini-nav-right{display:flex;gap:10px;}
+
+.page-wrap{max-width:1100px;margin:0 auto;padding:96px 48px 80px;}
+.back-link{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--text2);text-decoration:none;font-size:.85rem;
+  margin-bottom:32px;transition:color .2s;
+}
+.back-link:hover{color:var(--text);}
+
+.detail-grid{
+  display:grid;grid-template-columns:1fr 360px;
+  gap:28px;align-items:start;
+}
+
+/* Main item card */
+.item-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-xl);overflow:hidden;
+}
+.item-banner{
+  height:240px;display:flex;align-items:center;
+  justify-content:center;font-size:5.5rem;
+  position:relative;
+}
+.item-banner::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:60%;
+  background:linear-gradient(to bottom,transparent,var(--card));
+}
+.item-info{padding:32px 36px 36px;}
+.item-cat{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+.item-title{font-family:'DM Serif Display',serif;font-size:2rem;font-weight:400;margin-bottom:14px;line-height:1.15;}
+.item-desc{color:var(--text2);line-height:1.8;font-size:.93rem;margin-bottom:24px;}
+.item-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+.item-date{font-size:.78rem;color:var(--text3);}
+.sold-notice{
+  background:rgba(255,92,92,.07);border:1px solid rgba(255,92,92,.15);
+  border-radius:var(--radius);padding:16px 20px;
+  color:var(--red);font-size:.9rem;font-weight:600;
+  text-align:center;margin-bottom:20px;
+}
+.owner-bar{
+  display:flex;gap:10px;padding-top:20px;
+  border-top:1px solid var(--border);flex-wrap:wrap;
+}
+
+/* Sidebar */
+.sidebar{display:flex;flex-direction:column;gap:20px;}
+.side-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:24px;
+}
+.side-card-title{
+  font-size:.72rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text2);margin-bottom:16px;
+}
+.seller-name{font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:4px;}
+.seller-uni{font-size:.82rem;color:var(--text2);margin-bottom:12px;}
+.seller-rating{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.stars{color:var(--accent3);font-size:1rem;letter-spacing:1px;}
+.rating-val{font-size:.85rem;color:var(--text2);}
+
+/* Message form */
+.msg-textarea{
+  width:100%;background:var(--bg);border:1px solid var(--border2);
+  border-radius:var(--radius);padding:12px 16px;
+  color:var(--text);font-family:'Instrument Sans',sans-serif;
+  font-size:.88rem;resize:none;height:90px;outline:none;
+  transition:border-color .2s;margin-bottom:10px;
+}
+.msg-textarea:focus{border-color:rgba(200,245,102,.4);}
+.msg-textarea::placeholder{color:var(--text3);}
+
+/* Message list (seller view) */
+.msg-list{display:flex;flex-direction:column;gap:0;}
+.msg-item{
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+.msg-item:last-child{border-bottom:none;}
+.msg-sender{font-size:.8rem;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.msg-content{font-size:.85rem;color:var(--text2);line-height:1.6;}
+.msg-time{font-size:.7rem;color:var(--text3);margin-top:4px;}
+.msg-unread{
+  display:inline-block;width:6px;height:6px;
+  background:var(--accent);border-radius:50%;margin-right:6px;
+  vertical-align:middle;
+}
+/* Inline reply */
+.msg-reply-wrap{
+  display:none;margin-top:10px;padding-top:10px;
+  border-top:1px dashed var(--border2);
+}
+.msg-reply-wrap.open{display:block;}
+.reply-ta{
+  width:100%;background:var(--bg1);border:1px solid var(--border2);
+  border-radius:12px;padding:10px 14px;color:var(--text);
+  font-family:'Instrument Sans',sans-serif;font-size:.84rem;
+  resize:none;height:66px;outline:none;transition:border-color .2s;
+  margin-bottom:8px;
+}
+.reply-ta:focus{border-color:rgba(200,245,102,.4);}
+.reply-ta::placeholder{color:var(--text3);}
+
+/* Mark as sold form */
+.sold-form-wrap{padding-top:18px;border-top:1px solid var(--border);}
+.sold-form-title{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:14px;}
+.mini-input,.mini-select{
+  width:100%;background:var(--bg);border:1px solid var(--border2);
+  border-radius:12px;padding:10px 14px;
+  color:var(--text);font-family:'Instrument Sans',sans-serif;
+  font-size:.85rem;outline:none;transition:border-color .2s;
+  margin-bottom:10px;
+}
+.mini-input:focus,.mini-select:focus{border-color:rgba(200,245,102,.4);}
+.mini-select option{background:var(--card);}
+
+/* Seller reviews preview */
+.review-mini{padding:12px 0;border-bottom:1px solid var(--border);}
+.review-mini:last-child{border-bottom:none;}
+.review-mini-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.review-mini-name{font-size:.82rem;font-weight:600;}
+.review-mini-stars{color:var(--accent3);font-size:.82rem;}
+.review-mini-text{font-size:.8rem;color:var(--text2);line-height:1.55;font-style:italic;}
+
+.no-reviews{font-size:.82rem;color:var(--text3);text-align:center;padding:16px 0;}
+.login-prompt{text-align:center;padding:8px 0;}
+.login-prompt p{font-size:.85rem;color:var(--text2);margin-bottom:14px;}
+
+/* Image gallery */
+.gallery-wrap{height:240px;position:relative;overflow:hidden;}
+.gallery-main{width:100%;height:100%;object-fit:cover;display:block;}
+.gallery-thumbs{
+  display:flex;gap:6px;padding:8px 12px;
+  background:rgba(0,0,0,.4);
+  position:absolute;bottom:0;left:0;right:0;
+}
+.gallery-thumb{
+  width:44px;height:44px;border-radius:6px;overflow:hidden;
+  cursor:pointer;border:2px solid transparent;
+  transition:border-color .15s;flex-shrink:0;
+}
+.gallery-thumb.active{border-color:var(--accent);}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;}
+
+/* Price comparison widget */
+.price-bar-wrap{margin:14px 0;}
+.price-bar-track{
+  height:8px;background:var(--bg);border-radius:99px;
+  position:relative;overflow:visible;margin:8px 0;
+}
+.price-bar-fill{
+  height:100%;background:var(--accent);border-radius:99px;
+  transition:width .6s ease;min-width:4px;
+}
+.price-bar-marker{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--bg);
+  box-shadow:0 0 10px rgba(200,245,102,.5);
+}
+.price-compare-row{display:flex;justify-content:space-between;font-size:.7rem;color:var(--text3);}
+
+/* Similar items */
+.similar-section{padding:56px 48px 72px;border-top:1px solid var(--border);}
+.similar-inner{max-width:1100px;margin:0 auto;}
+.similar-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;margin-top:28px;
+}
+.sim-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:18px 20px;
+  text-decoration:none;color:var(--text);display:block;
+  transition:all .25s;
+}
+.sim-card:hover{transform:translateY(-4px);border-color:rgba(200,245,102,.2);}
+.sim-cat{font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.sim-title{font-family:'DM Serif Display',serif;font-size:.95rem;margin-bottom:8px;}
+.sim-foot{display:flex;justify-content:space-between;align-items:center;}
+.sim-price{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--accent);}
+
+@media(max-width:900px){
+  .mini-nav{padding:0 20px;}
+  .page-wrap{padding:80px 20px 60px;}
+  .detail-grid{grid-template-columns:1fr;}
+  .similar-section{padding:40px 20px 56px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="mini-nav">
+  <a href="/" class="mini-nav-logo">CampusSwap</a>
+  <div class="mini-nav-right">
+    {% if session.name %}
+      <a href="/profile" class="btn btn-ghost btn-sm">My Profile</a>
+      <a href="/post"    class="btn btn-primary btn-sm">+ Post Item</a>
+    {% else %}
+      <a href="/login" class="btn btn-ghost btn-sm">Login</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <a href="/" class="back-link">← Back to Listings</a>
+
+  <div class="detail-grid">
+
+    <!-- ── MAIN CARD ── -->
+    <div class="item-card">
+      {% if listing_images %}
+      <div class="gallery-wrap">
+        <img id="galleryMain" class="gallery-main"
+             src="/static/{{ listing_images[0].ImagePath }}" alt="{{ listing.Title }}">
+        {% if listing_images|length > 1 %}
+        <div class="gallery-thumbs">
+          {% for img in listing_images %}
+          <div class="gallery-thumb {% if loop.first %}active{% endif %}"
+               data-src="/static/{{ img.ImagePath }}">
+            <img src="/static/{{ img.ImagePath }}" alt="">
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="item-banner cat-bg-{{ (listing.ListingID % 6) + 1 }}">
+        {% if listing.CategoryName=='Textbooks' %}📚
+        {% elif listing.CategoryName=='Electronics' %}📱
+        {% elif listing.CategoryName=='Furniture' %}🛋️
+        {% elif listing.CategoryName=='Clothes' %}👕
+        {% elif listing.CategoryName=='Sports' %}⚽
+        {% elif listing.CategoryName=='Appliances' %}☕
+        {% else %}📦{% endif %}
+      </div>
+      {% endif %}
+      <div class="item-info">
+        <div class="item-cat">{{ listing.CategoryName }}</div>
+        <h1 class="item-title">{{ listing.Title }}</h1>
+        <p class="item-desc">{{ listing.Description }}</p>
+
+        {% if listing.Status == 'sold' %}
+        <div class="sold-notice">🎉 This item has been sold</div>
+        {% endif %}
+
+        <div class="item-meta">
+          <span class="badge" style="font-size:.85rem;padding:6px 16px;background:rgba(200,245,102,.1);color:var(--accent);border:1px solid rgba(200,245,102,.2);">
+            ${{ listing.Price }}
+          </span>
+          {% if listing.Condition == 'Like New' %}
+            <span class="badge badge-green">Like New</span>
+          {% elif listing.Condition == 'Good' %}
+            <span class="badge badge-amber">Good</span>
+          {% else %}
+            <span class="badge badge-muted">Fair</span>
+          {% endif %}
+          {% if listing.Status == 'active' %}
+            <span class="badge badge-green">Active</span>
+          {% else %}
+            <span class="badge badge-red">Sold</span>
+          {% endif %}
+        </div>
+        <div class="item-date">Posted on {{ listing.DatePosted }}</div>
+
+        <!-- Owner controls -->
+        {% if session.student_id is defined and session.student_id == listing.SellerID %}
+        <div class="owner-bar">
+          <a href="/edit/{{ listing.ListingID }}" class="btn btn-ghost btn-sm">✏️ Edit Listing</a>
+          <form method="POST" action="/delete/{{ listing.ListingID }}"
+                onsubmit="return confirm('Delete this listing permanently?')">
+            <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ── SIDEBAR ── -->
+    <div class="sidebar">
+
+      <!-- Seller card -->
+      <div class="side-card">
+        <div class="side-card-title">Seller</div>
+        <a href="/student/{{ listing.SellerID }}"
+           style="text-decoration:none;color:inherit;">
+          <div class="seller-name" style="transition:color .2s;"
+               onmouseover="this.style.color='var(--accent)'"
+               onmouseout="this.style.color='inherit'">{{ listing.SellerName }} →</div>
+        </a>
+        <div class="seller-uni">{{ listing.SellerEmail }}</div>
+        <div class="seller-rating">
+          <span class="stars">★★★★★</span>
+          <span class="rating-val">
+            {% if listing.SellerRating %}{{ listing.SellerRating }}/5{% else %}No ratings yet{% endif %}
+          </span>
+        </div>
+
+        <!-- Mark as sold (seller only, active only) -->
+        {% if session.student_id is defined and session.student_id == listing.SellerID and listing.Status == 'active' %}
+        <div class="sold-form-wrap">
+          <div class="sold-form-title">Mark as Sold</div>
+          <form method="POST" action="/mark_sold/{{ listing.ListingID }}">
+            <label class="form-label" style="font-size:.72rem;">Buyer's Student ID</label>
+            <input class="mini-input" type="number" name="buyer_id" placeholder="Enter buyer student ID" required>
+            <label class="form-label" style="font-size:.72rem;">Final Price ($)</label>
+            <input class="mini-input" type="number" name="final_price" value="{{ listing.Price }}" step="0.01" required>
+            <label class="form-label" style="font-size:.72rem;">Payment Method</label>
+            <select class="mini-select" name="payment_method">
+              <option>Cash</option><option>Venmo</option>
+              <option>Zelle</option><option>PayPal</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-block" style="border-radius:var(--radius);padding:11px;">
+              ✓ Mark as Sold
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Watchlist save card (buyers only, active listings) -->
+      {% if session.name and session.student_id != listing.SellerID %}
+      <div class="side-card" style="text-align:center;">
+        {% if watchlist_count > 0 %}
+          <div style="font-size:.8rem;color:var(--text2);margin-bottom:10px;">
+            ♥ {{ watchlist_count }} student{{ 's' if watchlist_count != 1 }} saved this
+          </div>
+        {% endif %}
+        {% if is_watched %}
+          <form method="POST" action="/unwatch/{{ listing.ListingID }}">
+            <button type="submit" class="btn btn-ghost" style="width:100%;border-color:rgba(200,245,102,.3);">
+              ♥ Saved — click to unsave
+            </button>
+          </form>
+        {% else %}
+          <form method="POST" action="/watch/{{ listing.ListingID }}">
+            <button type="submit" class="btn btn-ghost" style="width:100%;">
+              ♡ Save for later
+            </button>
+          </form>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Message box: for buyers (not seller, not sold) -->
+      {% if session.name %}
+        {% if session.student_id != listing.SellerID and listing.Status == 'active' %}
+        <div class="side-card">
+          <div class="side-card-title">💬 Message Seller</div>
+          <form method="POST" action="/send_message">
+            <input type="hidden" name="receiver_id" value="{{ listing.SellerID }}">
+            <input type="hidden" name="listing_id"  value="{{ listing.ListingID }}">
+            <textarea class="msg-textarea" name="content"
+                      placeholder="Hi! Is this still available? Can we meet on campus?" required></textarea>
+            <button type="submit" class="btn btn-primary btn-block" style="border-radius:var(--radius);padding:11px;">
+              Send Message →
+            </button>
+          </form>
+        </div>
+        {% endif %}
+
+        <!-- Inbox: seller sees messages from buyers -->
+        {% if session.student_id == listing.SellerID %}
+        <div class="side-card">
+          <div class="side-card-title">
+            📬 Messages
+            {% if messages %}<span style="color:var(--accent);">({{ messages|length }})</span>{% endif %}
+          </div>
+          {% if messages %}
+          <div class="msg-list">
+            {% for msg in messages %}
+            <div class="msg-item">
+              <div class="msg-sender">
+                {% if not msg.IsRead %}<span class="msg-unread"></span>{% endif %}
+                {{ msg.SenderName }}
+              </div>
+              <div class="msg-content">{{ msg.Content }}</div>
+              <div class="msg-time">{{ msg.Timestamp }}</div>
+              <button class="btn btn-ghost btn-sm"
+                style="margin-top:8px;font-size:.72rem;"
+                onclick="toggleMsgReply('mreply-{{ loop.index }}')">↩ Reply</button>
+              <!-- Inline reply -->
+              <div class="msg-reply-wrap" id="mreply-{{ loop.index }}">
+                <form method="POST" action="/send_message">
+                  <input type="hidden" name="receiver_id" value="{{ msg.SenderID }}">
+                  <input type="hidden" name="listing_id"  value="{{ listing.ListingID }}">
+                  <textarea class="reply-ta" name="content"
+                    placeholder="Reply to {{ msg.SenderName }}…" required></textarea>
+                  <div style="display:flex;gap:8px;">
+                    <button type="submit" class="btn btn-primary btn-sm">Send →</button>
+                    <button type="button" class="btn btn-ghost btn-sm"
+                      onclick="toggleMsgReply('mreply-{{ loop.index }}')">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="no-reviews">No messages yet for this listing.</div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+      {% else %}
+        <div class="side-card">
+          <div class="login-prompt">
+            <p>Login to message this seller</p>
+            <a href="/login" class="btn btn-primary btn-block" style="border-radius:var(--radius);">Login to Message</a>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Price Intelligence -->
+      {% if listing.CatAvg %}
+      <div class="side-card">
+        <div class="side-card-title">📊 Price Intelligence</div>
+        <div style="margin-bottom:10px;">
+          {% if listing.DealScore == 'Hot' %}
+            {% set savings = ((listing.CatAvg - listing.Price) / listing.CatAvg * 100) | round | int %}
+            <span class="badge badge-green" style="font-size:.75rem;">🔥 {{ savings }}% below market average</span>
+          {% elif listing.DealScore == 'High' %}
+            {% set over = ((listing.Price - listing.CatAvg) / listing.CatAvg * 100) | round | int %}
+            <span class="badge badge-amber" style="font-size:.75rem;">↑ {{ over }}% above market average</span>
+          {% else %}
+            <span class="badge badge-muted" style="font-size:.75rem;">✓ Priced near market average</span>
+          {% endif %}
+        </div>
+        <div class="price-bar-wrap">
+          {% if listing.CatMin and listing.CatMax and listing.CatMax > listing.CatMin %}
+            {% set range_val = listing.CatMax - listing.CatMin %}
+            {% set raw = (listing.Price - listing.CatMin) / range_val * 100 %}
+            {% if raw < 3 %}{% set fill_pct = 3 %}
+            {% elif raw > 100 %}{% set fill_pct = 100 %}
+            {% else %}{% set fill_pct = raw | round | int %}{% endif %}
+          {% else %}
+            {% set fill_pct = 50 %}
+          {% endif %}
+          <div class="price-bar-track">
+            <div class="price-bar-fill" style="width:{{ fill_pct }}%;"></div>
+            <div class="price-bar-marker" style="left:calc({{ fill_pct }}% - 7px);"></div>
+          </div>
+          <div class="price-compare-row">
+            <span>${{ listing.CatMin or '—' }} min</span>
+            <span>${{ listing.CatAvg }} avg</span>
+            <span>${{ listing.CatMax or '—' }} max</span>
+          </div>
+        </div>
+        <div style="font-size:.75rem;color:var(--text3);margin-top:6px;">
+          Based on active {{ listing.CategoryName }} listings
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Seller reviews preview -->
+      <div class="side-card">
+        <div class="side-card-title">⭐ Seller Reviews</div>
+        {% if seller_reviews %}
+          {% for r in seller_reviews %}
+          <div class="review-mini">
+            <div class="review-mini-header">
+              <span class="review-mini-name">{{ r.ReviewerName }}</span>
+              <span class="review-mini-stars">{{ '★' * r.Rating }}{{ '☆' * (5 - r.Rating) }}</span>
+            </div>
+            <div class="review-mini-text">"{{ r.Comment }}"</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="no-reviews">No reviews yet for this seller.</div>
+        {% endif %}
+      </div>
+
+    </div><!-- /sidebar -->
+  </div><!-- /detail-grid -->
+</div>
+
+{% if similar %}
+<section class="similar-section">
+  <div class="similar-inner">
+    <div class="section-eyebrow">More Like This</div>
+    <h2 class="section-title" style="margin-bottom:0;font-size:1.6rem;">
+      Similar {{ listing.CategoryName }} Listings
+    </h2>
+    <div class="similar-grid">
+      {% for s in similar %}
+      <a href="/listing/{{ s.ListingID }}" class="sim-card">
+        <div class="sim-cat">{{ s.CategoryName }}</div>
+        <div class="sim-title">{{ s.Title }}</div>
+        <div class="sim-foot">
+          <div class="sim-price">${{ s.Price }}</div>
+          {% if s.Condition == 'Like New' %}
+            <span class="badge badge-green" style="font-size:.65rem;">Like New</span>
+          {% elif s.Condition == 'Good' %}
+            <span class="badge badge-amber" style="font-size:.65rem;">Good</span>
+          {% else %}
+            <span class="badge badge-muted" style="font-size:.65rem;">Fair</span>
+          {% endif %}
+        </div>
+        <div style="font-size:.74rem;color:var(--text3);margin-top:8px;">
+          {{ s.SellerName }}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<script>
+function toggleMsgReply(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) el.querySelector('textarea').focus();
+}
+
+// Image gallery thumbnail switching
+document.querySelectorAll('.gallery-thumb').forEach(thumb => {
+  thumb.addEventListener('click', () => {
+    document.getElementById('galleryMain').src = thumb.dataset.src;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

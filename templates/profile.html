@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Profile — CampusSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+.mini-nav{
+  position:fixed;top:0;left:0;right:0;height:64px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 48px;
+  background:rgba(8,8,16,.92);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);z-index:200;
+}
+.mini-nav-logo{font-family:'DM Serif Display',serif;font-size:1.5rem;text-decoration:none;color:var(--text);}
+.mini-nav-right{display:flex;gap:10px;}
+
+.page-wrap{max-width:1100px;margin:0 auto;padding:96px 48px 80px;}
+
+/* ── Profile Header ── */
+.profile-header{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-xl);padding:40px 44px;
+  display:flex;align-items:center;gap:32px;
+  margin-bottom:32px;position:relative;overflow:hidden;
+}
+.profile-header::before{
+  content:'';position:absolute;top:0;right:0;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,245,102,.06) 0%,transparent 70%);
+  transform:translate(30%,-30%);
+}
+.avatar-wrap{position:relative;flex-shrink:0;}
+.avatar{
+  width:84px;height:84px;border-radius:22px;
+  background:linear-gradient(135deg,var(--accent),#a8ff6e);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:2.2rem;color:#0a0f00;
+}
+.avatar-ring{
+  position:absolute;inset:-3px;border-radius:25px;
+  border:2px solid rgba(200,245,102,.3);
+  animation:ringpulse 2.5s ease-in-out infinite;
+}
+@keyframes ringpulse{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.03);}}
+.profile-info{flex:1;}
+.profile-name{font-family:'DM Serif Display',serif;font-size:1.9rem;margin-bottom:5px;}
+.profile-meta{font-size:.85rem;color:var(--text2);margin-bottom:4px;}
+.profile-uni{font-size:.82rem;color:var(--text3);}
+.profile-stats{display:flex;gap:32px;margin-top:22px;flex-wrap:wrap;}
+.pst{text-align:center;}
+.pst-n{
+  font-family:'DM Serif Display',serif;font-size:1.8rem;
+  color:var(--accent);display:block;
+}
+.pst-l{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+.profile-actions{display:flex;gap:10px;flex-direction:column;flex-shrink:0;}
+
+/* ── Tabs ── */
+.tabs-wrap{
+  display:flex;gap:4px;margin-bottom:28px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:99px;padding:4px;width:fit-content;
+}
+.tab-btn{
+  padding:9px 22px;border-radius:99px;font-size:.85rem;font-weight:600;
+  cursor:pointer;border:none;background:transparent;color:var(--text2);
+  font-family:'Instrument Sans',sans-serif;transition:all .2s;
+  display:flex;align-items:center;gap:6px;
+}
+.tab-btn.active{background:var(--accent);color:#0a0f00;}
+.tab-badge{
+  background:rgba(200,245,102,.2);color:var(--accent);
+  border-radius:99px;padding:1px 7px;font-size:.7rem;font-weight:700;
+}
+.tab-btn.active .tab-badge{background:rgba(0,0,0,.15);color:#0a0f00;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── Listing mini grid ── */
+.mini-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.mcard{
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:all .25s ease;text-decoration:none;color:var(--text);display:block;
+}
+.mcard:hover{transform:translateY(-5px);border-color:rgba(200,245,102,.2);}
+.mcard-img{
+  height:110px;display:flex;align-items:center;
+  justify-content:center;font-size:2.5rem;
+}
+.mcard-body{padding:16px 18px;}
+.mcard-title{font-family:'DM Serif Display',serif;font-size:.97rem;margin-bottom:6px;line-height:1.25;}
+.mcard-price{color:var(--accent);font-weight:700;font-size:.9rem;margin-bottom:10px;}
+.mcard-status-a{color:var(--accent);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.mcard-status-s{color:var(--red);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.mcard-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+
+/* ── Reviews ── */
+.review-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:22px 26px;margin-bottom:14px;
+}
+.rv-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.rv-name{font-weight:700;font-size:.9rem;}
+.rv-stars{color:var(--accent3);font-size:.95rem;letter-spacing:1px;}
+.rv-comment{color:var(--text2);font-size:.88rem;line-height:1.7;font-style:italic;}
+.rv-date{font-size:.72rem;color:var(--text3);margin-top:8px;}
+
+/* Leave review form */
+.review-form-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:24px;
+}
+.review-form-title{font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:20px;}
+/* Interactive star rating */
+.star-row{display:flex;gap:6px;margin-bottom:14px;}
+.star-btn{
+  font-size:1.8rem;cursor:pointer;color:var(--border2);
+  transition:color .15s,transform .15s;line-height:1;
+  background:none;border:none;padding:0;
+}
+.star-btn.lit{color:var(--accent3);}
+.star-btn:hover{transform:scale(1.2);}
+/* Flash message */
+.flash-msg{
+  border-radius:var(--radius);padding:12px 18px;
+  font-size:.88rem;font-weight:600;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+}
+.flash-success{background:rgba(200,245,102,.1);border:1px solid rgba(200,245,102,.25);color:var(--accent);}
+.flash-info{background:rgba(123,110,246,.1);border:1px solid rgba(123,110,246,.25);color:var(--accent2);}
+/* Review card improvement */
+.rv-avatar{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.88rem;color:#fff;
+}
+.rv-body{flex:1;}
+
+/* Inbox */
+.inbox-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:12px;
+  display:flex;gap:16px;align-items:flex-start;
+}
+.inbox-icon{
+  width:42px;height:42px;border-radius:12px;
+  background:rgba(200,245,102,.1);border:1px solid rgba(200,245,102,.18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.inbox-from{font-weight:700;font-size:.88rem;margin-bottom:3px;}
+.inbox-listing{font-size:.78rem;color:var(--accent);margin-bottom:5px;}
+.inbox-content{font-size:.85rem;color:var(--text2);line-height:1.6;}
+.inbox-time{font-size:.72rem;color:var(--text3);margin-top:5px;}
+.inbox-unread-dot{
+  width:8px;height:8px;background:var(--accent);
+  border-radius:50%;flex-shrink:0;margin-top:6px;
+}
+/* Reply form */
+.reply-form-wrap{
+  display:none;margin-top:12px;padding-top:12px;
+  border-top:1px solid var(--border);
+}
+.reply-form-wrap.open{display:block;}
+.reply-textarea{
+  width:100%;background:var(--bg);border:1px solid var(--border2);
+  border-radius:var(--radius);padding:10px 14px;
+  color:var(--text);font-family:'Instrument Sans',sans-serif;
+  font-size:.85rem;resize:none;height:72px;outline:none;
+  transition:border-color .2s;margin-bottom:8px;
+}
+.reply-textarea:focus{border-color:rgba(200,245,102,.4);}
+.reply-textarea::placeholder{color:var(--text3);}
+.reply-actions{display:flex;gap:8px;}
+
+/* Purchases */
+.purchase-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.purchase-title{font-family:'DM Serif Display',serif;font-size:1rem;margin-bottom:4px;}
+.purchase-meta{font-size:.8rem;color:var(--text2);}
+.purchase-price{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--accent);}
+
+/* Empty */
+.empty-state{
+  text-align:center;padding:64px 20px;
+  color:var(--text2);
+}
+.empty-state-icon{font-size:3rem;margin-bottom:14px;}
+.empty-state p{font-size:.92rem;}
+.empty-state a{color:var(--accent);text-decoration:none;font-weight:600;}
+
+@media(max-width:900px){
+  .mini-nav{padding:0 20px;}
+  .page-wrap{padding:80px 20px 60px;}
+  .profile-header{flex-direction:column;text-align:center;padding:32px 24px;}
+  .profile-stats{justify-content:center;}
+  .profile-actions{flex-direction:row;justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<nav class="mini-nav">
+  <a href="/" class="mini-nav-logo">CampusSwap</a>
+  <div class="mini-nav-right">
+    <a href="/" class="btn btn-ghost btn-sm">← Browse</a>
+    <a href="/post" class="btn btn-primary btn-sm">+ Post Item</a>
+    <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="avatar-wrap">
+      <div class="avatar">{{ student.Name[0] }}</div>
+      <div class="avatar-ring"></div>
+    </div>
+    <div class="profile-info">
+      <h1 class="profile-name">{{ student.Name }}</h1>
+      <div class="profile-meta">{{ student.Email }}</div>
+      <div class="profile-uni">{{ student.University }} · Member since {{ student.JoinDate }}</div>
+      <div class="profile-stats">
+        <div class="pst">
+          <span class="pst-n">{{ my_listings|length }}</span>
+          <span class="pst-l">Listings</span>
+        </div>
+        <div class="pst">
+          <span class="pst-n">{{ purchases|length }}</span>
+          <span class="pst-l">Purchases</span>
+        </div>
+        <div class="pst">
+          <span class="pst-n">{{ reviews|length }}</span>
+          <span class="pst-l">Reviews</span>
+        </div>
+        <div class="pst">
+          <span class="pst-n">{{ student.Rating or '—' }}</span>
+          <span class="pst-l">Rating</span>
+        </div>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a href="/post" class="btn btn-primary">+ Post Item</a>
+      <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrap">
+    <button class="tab-btn active" onclick="showTab('listings',this)">
+      My Listings
+      <span class="tab-badge">{{ my_listings|length }}</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('inbox',this)">
+      Inbox
+      {% set unread = inbox|selectattr('IsRead','equalto',0)|list|length %}
+      {% if unread > 0 %}
+      <span class="tab-badge">{{ unread }}</span>
+      {% endif %}
+    </button>
+    <button class="tab-btn" onclick="showTab('saved',this)">
+      Saved
+      {% if watchlist %}<span class="tab-badge">{{ watchlist|length }}</span>{% endif %}
+    </button>
+    <button class="tab-btn" onclick="showTab('reviews',this)">
+      Reviews
+      <span class="tab-badge">{{ reviews|length }}</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('purchases',this)">
+      Purchases
+      <span class="tab-badge">{{ purchases|length }}</span>
+    </button>
+  </div>
+
+  <!-- ── MY LISTINGS TAB ── -->
+  <div class="tab-panel active" id="panel-listings">
+    {% if my_listings %}
+    <div class="mini-grid">
+      {% for l in my_listings %}
+      <div class="mcard">
+        <div class="mcard-img cat-bg-{{ (loop.index % 6) + 1 }}">
+          {% if l.PrimaryImage %}
+            <img src="/static/{{ l.PrimaryImage }}" alt="{{ l.Title }}"
+                 style="width:100%;height:100%;object-fit:cover;">
+          {% elif l.CategoryName=='Textbooks' %}📚
+          {% elif l.CategoryName=='Electronics' %}📱
+          {% elif l.CategoryName=='Furniture' %}🛋️
+          {% elif l.CategoryName=='Clothes' %}👕
+          {% elif l.CategoryName=='Sports' %}⚽
+          {% else %}☕{% endif %}
+        </div>
+        <div class="mcard-body">
+          <div class="mcard-title">{{ l.Title }}</div>
+          <div class="mcard-price">${{ l.Price }}</div>
+          <div class="{% if l.Status=='active' %}mcard-status-a{% else %}mcard-status-s{% endif %}">
+            ● {{ l.Status|upper }}
+          </div>
+          <div class="mcard-actions">
+            <a href="/listing/{{ l.ListingID }}" class="btn btn-ghost btn-sm">View</a>
+            <a href="/edit/{{ l.ListingID }}"    class="btn btn-ghost btn-sm">Edit</a>
+            <form method="POST" action="/delete/{{ l.ListingID }}"
+                  onsubmit="return confirm('Delete this listing?')" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📦</div>
+      <p>You haven't posted anything yet.<br>
+         <a href="/post">Post your first listing →</a></p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── SAVED / WATCHLIST TAB ── -->
+  <div class="tab-panel" id="panel-saved">
+    {% if watchlist %}
+    <div class="mini-grid">
+      {% for item in watchlist %}
+      <a href="/listing/{{ item.ListingID }}" class="mcard" style="text-decoration:none;">
+        <div class="mcard-img cat-bg-{{ (loop.index % 6) + 1 }}">
+          {% if item.PrimaryImage %}
+            <img src="/static/{{ item.PrimaryImage }}" alt="{{ item.Title }}"
+                 style="width:100%;height:100%;object-fit:cover;">
+          {% elif item.CategoryName=='Textbooks' %}📚
+          {% elif item.CategoryName=='Electronics' %}📱
+          {% elif item.CategoryName=='Furniture' %}🛋️
+          {% elif item.CategoryName=='Clothes' %}👕
+          {% elif item.CategoryName=='Sports' %}⚽
+          {% else %}☕{% endif %}
+        </div>
+        <div class="mcard-body">
+          <div style="font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">
+            {{ item.CategoryName }}
+          </div>
+          <div class="mcard-title">{{ item.Title }}</div>
+          <div class="mcard-price">${{ item.Price }}</div>
+          <div style="font-size:.75rem;color:var(--text3);">
+            Seller: {{ item.SellerName }} ·
+            {% if item.Status == 'active' %}
+              <span style="color:var(--accent);">Active</span>
+            {% else %}
+              <span style="color:var(--red);">Sold</span>
+            {% endif %}
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
+            <form method="POST" action="/unwatch/{{ item.ListingID }}"
+                  onclick="event.stopPropagation()">
+              <button type="submit" class="btn btn-ghost btn-sm"
+                      style="font-size:.72rem;padding:4px 10px;">✕ Unsave</button>
+            </form>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">♡</div>
+      <p>No saved items yet.<br>
+         <a href="/">Browse listings and save ones you like →</a></p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── INBOX TAB ── -->
+  <div class="tab-panel" id="panel-inbox">
+    {% if inbox %}
+      {% for msg in inbox %}
+      <div class="inbox-card" style="flex-direction:column;">
+        <div style="display:flex;gap:16px;align-items:flex-start;width:100%;">
+          {% if not msg.IsRead %}<div class="inbox-unread-dot" style="margin-top:6px;"></div>{% endif %}
+          <div class="inbox-icon">💬</div>
+          <div style="flex:1;">
+            <div class="inbox-from">{{ msg.SenderName }}</div>
+            <div class="inbox-listing">Re: {{ msg.ListingTitle }}</div>
+            <div class="inbox-content">{{ msg.Content }}</div>
+            <div class="inbox-time">{{ msg.Timestamp }}</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-primary btn-sm"
+                onclick="toggleReply('reply-{{ loop.index }}')">↩ Reply</button>
+              <a href="/listing/{{ msg.ListingID }}" class="btn btn-ghost btn-sm">View Listing</a>
+            </div>
+          </div>
+        </div>
+        <!-- Inline reply form -->
+        <div class="reply-form-wrap" id="reply-{{ loop.index }}">
+          <form method="POST" action="/send_message">
+            <input type="hidden" name="receiver_id" value="{{ msg.SenderID }}">
+            <input type="hidden" name="listing_id"  value="{{ msg.ListingID }}">
+            <textarea class="reply-textarea" name="content"
+              placeholder="Write your reply to {{ msg.SenderName }}…" required></textarea>
+            <div class="reply-actions">
+              <button type="submit" class="btn btn-primary btn-sm">Send Reply →</button>
+              <button type="button" class="btn btn-ghost btn-sm"
+                onclick="toggleReply('reply-{{ loop.index }}')">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📬</div>
+      <p>Your inbox is empty. Messages from buyers will appear here.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── REVIEWS TAB ── -->
+  <div class="tab-panel" id="panel-reviews">
+
+    <!-- Flash messages -->
+    {% if msg == 'reviewed' %}
+    <div class="flash-msg flash-success">✓ Your review was submitted successfully!</div>
+    {% elif msg == 'already_reviewed' %}
+    <div class="flash-msg flash-info">ℹ You have already reviewed this transaction.</div>
+    {% endif %}
+
+    <!-- Leave a review (only for unreviewed purchases, computed in Python) -->
+    {% if unreviewed_purchases %}
+    <div class="review-form-card">
+      <div class="review-form-title">Leave a Review</div>
+      <form method="POST" action="/review">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Select Purchase</label>
+            <select class="form-select" name="transaction_id" id="txSelect" onchange="fillSeller()">
+              {% for p in unreviewed_purchases %}
+                <option value="{{ p.TransactionID }}" data-seller="{{ p.SellerID }}">
+                  {{ p.ListingTitle }} — {{ p.SellerName }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Rating</label>
+            <div class="star-row" id="starRow">
+              <button type="button" class="star-btn lit" data-val="1">★</button>
+              <button type="button" class="star-btn lit" data-val="2">★</button>
+              <button type="button" class="star-btn lit" data-val="3">★</button>
+              <button type="button" class="star-btn lit" data-val="4">★</button>
+              <button type="button" class="star-btn lit" data-val="5">★</button>
+            </div>
+            <input type="hidden" name="rating" id="ratingVal" value="5">
+          </div>
+        </div>
+        <input type="hidden" name="reviewee_id" id="revieweeId"
+               value="{{ unreviewed_purchases[0].SellerID }}">
+        <div class="form-group">
+          <label class="form-label">Comment</label>
+          <textarea class="form-textarea" name="comment" rows="3"
+                    placeholder="How was your experience with this seller?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary"
+                style="border-radius:var(--radius);padding:12px 32px;">
+          Submit Review ★
+        </button>
+      </form>
+    </div>
+    {% elif purchases %}
+    <div class="flash-msg flash-info" style="margin-bottom:20px;">
+      ✓ You have reviewed all your purchases.
+    </div>
+    {% endif %}
+
+    <!-- Reviews received -->
+    {% if reviews %}
+      {% for r in reviews %}
+      <div class="review-card" style="display:flex;gap:16px;align-items:flex-start;">
+        <div class="rv-avatar">{{ r.ReviewerName[0] }}</div>
+        <div class="rv-body" style="flex:1;">
+          <div class="rv-header">
+            <span class="rv-name">{{ r.ReviewerName }}</span>
+            <span class="rv-stars">
+              {% for s in range(r.Rating) %}★{% endfor %}{% for s in range(5 - r.Rating) %}☆{% endfor %}
+            </span>
+          </div>
+          <div class="rv-comment">"{{ r.Comment }}"</div>
+          <div class="rv-date">{{ r.Date }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">⭐</div>
+      <p>No reviews yet. Complete a transaction to start getting ratings!</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── PURCHASES TAB ── -->
+  <div class="tab-panel" id="panel-purchases">
+    {% if purchases %}
+      {% for p in purchases %}
+      <div class="purchase-card">
+        <div>
+          <div class="purchase-title">{{ p.ListingTitle }}</div>
+          <div class="purchase-meta">
+            From {{ p.SellerName }} · {{ p.Date }} · {{ p.PaymentMethod }}
+          </div>
+        </div>
+        <div class="purchase-price">${{ p.FinalPrice }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">🛍️</div>
+      <p>No purchases yet. <a href="/">Browse listings →</a></p>
+    </div>
+    {% endif %}
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+function toggleReply(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) el.querySelector('textarea').focus();
+}
+function fillSeller() {
+  const sel = document.getElementById('txSelect');
+  if (!sel) return;
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById('revieweeId').value = opt.dataset.seller || '';
+}
+
+// Interactive star rating (delegated — no inline Jinja2 in onclick)
+function setRating(val) {
+  document.getElementById('ratingVal').value = val;
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('lit', i < val);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => setRating(parseInt(btn.dataset.val)));
+    btn.addEventListener('mouseenter', () => {
+      const v = parseInt(btn.dataset.val);
+      document.querySelectorAll('.star-btn').forEach((b, i) => {
+        b.classList.toggle('lit', i < v);
+      });
+    });
+  });
+  const row = document.getElementById('starRow');
+  if (row) row.addEventListener('mouseleave', () => {
+    const cur = parseInt(document.getElementById('ratingVal').value) || 5;
+    setRating(cur);
+  });
+});
+</script>
+</body>
+</html>

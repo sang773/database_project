@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Market Intelligence — CampusSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+/* ── Nav ── */
+.mini-nav{
+  position:fixed;top:0;left:0;right:0;height:64px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 48px;
+  background:rgba(8,8,16,.92);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);z-index:200;
+}
+.mini-nav-logo{font-family:'DM Serif Display',serif;font-size:1.5rem;text-decoration:none;color:var(--text);}
+
+/* ── Page ── */
+.page-wrap{max-width:1200px;margin:0 auto;padding:96px 48px 80px;}
+
+/* ── Header ── */
+.insights-header{
+  text-align:center;padding:48px 0 52px;
+  position:relative;
+}
+.insights-header::after{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:80px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+}
+.insights-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(200,245,102,.08);border:1px solid rgba(200,245,102,.2);
+  color:var(--accent);font-size:.72rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 16px;border-radius:99px;margin-bottom:22px;
+}
+.insights-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(2.4rem,5vw,3.8rem);
+  font-weight:400;line-height:1.05;letter-spacing:-.025em;
+  margin-bottom:14px;
+}
+.insights-title em{font-style:italic;color:var(--accent);}
+.insights-sub{font-size:.97rem;color:var(--text2);max-width:500px;margin:0 auto;}
+
+/* ── Summary cards ── */
+.summary-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:16px;margin-bottom:48px;
+}
+.sum-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:24px 26px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.sum-card:hover{border-color:rgba(200,245,102,.2);}
+.sum-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.sum-card-1::before{background:var(--accent);}
+.sum-card-2::before{background:var(--accent2);}
+.sum-card-3::before{background:var(--accent3);}
+.sum-card-4::before{background:var(--red);}
+.sum-icon{font-size:1.6rem;margin-bottom:12px;display:block;}
+.sum-val{
+  font-family:'DM Serif Display',serif;font-size:2rem;
+  font-weight:400;display:block;margin-bottom:4px;
+}
+.sum-label{font-size:.74rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+
+/* ── Two-col layout ── */
+.two-col{display:grid;grid-template-columns:1fr 380px;gap:24px;margin-bottom:40px;}
+
+/* ── Section card ── */
+.section-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-xl);padding:32px 36px;
+}
+.sc-title{
+  font-family:'DM Serif Display',serif;font-size:1.25rem;
+  margin-bottom:28px;display:flex;align-items:center;gap:10px;
+}
+.sc-title span{font-family:'Instrument Sans',sans-serif;font-size:.72rem;color:var(--text2);font-weight:400;}
+
+/* ── Category bars ── */
+.cat-row{display:flex;flex-direction:column;gap:16px;}
+.cat-bar-item{}
+.cat-bar-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:7px;
+}
+.cat-bar-name{
+  font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:8px;
+}
+.cat-bar-meta{font-size:.76rem;color:var(--text3);}
+.cat-bar-track{
+  height:9px;background:var(--bg);border-radius:99px;
+  overflow:hidden;
+}
+.cat-bar-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),#a8ff6e);
+  transition:width .8s cubic-bezier(.16,1,.3,1);
+}
+.cat-bar-stats{
+  display:flex;gap:16px;margin-top:5px;
+  font-size:.68rem;color:var(--text3);
+}
+
+/* ── Top sellers leaderboard ── */
+.seller-row{
+  display:flex;flex-direction:column;gap:12px;
+}
+.seller-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:var(--radius);transition:border-color .2s;
+}
+.seller-item:hover{border-color:rgba(200,245,102,.15);}
+.seller-rank{
+  font-family:'DM Serif Display',serif;font-size:1.1rem;
+  color:var(--text3);min-width:24px;text-align:center;
+}
+.seller-rank-1{color:var(--accent3);}
+.seller-rank-2{color:#a0a0b8;}
+.seller-rank-3{color:#b87333;}
+.seller-avatar{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.9rem;color:#fff;
+}
+.seller-info{flex:1;}
+.seller-name{font-weight:700;font-size:.88rem;margin-bottom:2px;}
+.seller-meta{font-size:.72rem;color:var(--text2);}
+.seller-rating{
+  font-family:'DM Serif Display',serif;font-size:1.1rem;
+  color:var(--accent3);white-space:nowrap;
+  display:flex;align-items:center;gap:4px;
+}
+
+/* ── Hot deals grid ── */
+.deals-section{margin-bottom:40px;}
+.deals-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;margin-top:24px;
+}
+.deal-card-ins{
+  background:var(--card);border:1px solid rgba(200,245,102,.2);
+  border-radius:var(--radius-lg);padding:20px 22px;
+  text-decoration:none;color:var(--text);display:block;
+  position:relative;overflow:hidden;transition:all .25s;
+}
+.deal-card-ins::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),#a8ff6e);
+}
+.deal-card-ins:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 48px rgba(0,0,0,.4);
+}
+.deal-off{
+  display:inline-block;
+  background:var(--accent);color:#0a0f00;
+  font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 10px;border-radius:99px;margin-bottom:10px;
+}
+.deal-ins-title{font-family:'DM Serif Display',serif;font-size:.97rem;margin-bottom:6px;}
+.deal-ins-cat{font-size:.72rem;color:var(--text3);margin-bottom:12px;}
+.deal-ins-foot{display:flex;justify-content:space-between;align-items:flex-end;}
+.deal-ins-price{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--accent);}
+.deal-ins-avg{font-size:.72rem;color:var(--text3);}
+.no-deals{
+  text-align:center;padding:40px 20px;color:var(--text2);
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+}
+
+/* ── Recent transactions table ── */
+.tx-section{margin-bottom:40px;}
+.tx-table{width:100%;border-collapse:collapse;}
+.tx-table th{
+  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);padding:0 16px 14px;text-align:left;
+  border-bottom:1px solid var(--border);
+}
+.tx-table td{
+  padding:14px 16px;font-size:.84rem;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  vertical-align:middle;
+}
+.tx-table tr:last-child td{border-bottom:none;}
+.tx-table tr:hover td{background:rgba(255,255,255,.02);}
+.tx-item{font-weight:600;font-size:.86rem;}
+.tx-method{
+  font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;
+  background:rgba(200,245,102,.08);color:var(--accent);
+  border:1px solid rgba(200,245,102,.15);
+}
+.tx-price{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--accent);}
+.no-tx{
+  text-align:center;padding:40px 20px;color:var(--text2);
+  background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);
+}
+
+/* ── Query reference ── */
+.queries-section{margin-top:48px;}
+.query-block{
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:16px;
+}
+.query-label{
+  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:10px;
+}
+.query-code{
+  font-family:'Courier New',monospace;font-size:.78rem;
+  color:var(--text2);line-height:1.7;white-space:pre-wrap;
+}
+.query-code .kw{color:var(--accent2);}
+.query-code .fn{color:var(--accent3);}
+
+/* ── Responsive ── */
+@media(max-width:1000px){
+  .two-col{grid-template-columns:1fr;}
+  .summary-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:680px){
+  .mini-nav{padding:0 20px;}
+  .page-wrap{padding:80px 20px 60px;}
+  .summary-row{grid-template-columns:1fr 1fr;}
+  .section-card{padding:24px;}
+  .tx-table th:nth-child(n+4),.tx-table td:nth-child(n+4){display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="mini-nav">
+  <a href="/" class="mini-nav-logo">CampusSwap</a>
+  <div style="display:flex;gap:10px;">
+    <a href="/" class="btn btn-ghost btn-sm">← Browse</a>
+    {% if session.name %}
+      <a href="/profile" class="btn btn-ghost btn-sm">Profile</a>
+      <a href="/post"    class="btn btn-primary btn-sm">+ Post Item</a>
+    {% else %}
+      <a href="/login"   class="btn btn-ghost btn-sm">Login</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ── HEADER ── -->
+  <div class="insights-header">
+    <div class="insights-eyebrow">📊 Live Data</div>
+    <h1 class="insights-title">Campus Market <em>Intelligence</em></h1>
+    <p class="insights-sub">
+      Real-time pricing trends, hot deals, and seller performance —
+      powered by live campus transaction data.
+    </p>
+  </div>
+
+  <!-- ── SUMMARY STATS ── -->
+  <div class="summary-row">
+    <div class="sum-card sum-card-1">
+      <span class="sum-icon">🏷️</span>
+      <span class="sum-val">{{ summary.active_listings or 0 }}</span>
+      <span class="sum-label">Active Listings</span>
+    </div>
+    <div class="sum-card sum-card-2">
+      <span class="sum-icon">🎓</span>
+      <span class="sum-val">{{ summary.total_students or 0 }}</span>
+      <span class="sum-label">Registered Students</span>
+    </div>
+    <div class="sum-card sum-card-3">
+      <span class="sum-icon">🤝</span>
+      <span class="sum-val">{{ summary.completed_sales or 0 }}</span>
+      <span class="sum-label">Completed Sales</span>
+    </div>
+    <div class="sum-card sum-card-4">
+      <span class="sum-icon">💰</span>
+      <span class="sum-val">${{ summary.total_value or '0.00' }}</span>
+      <span class="sum-label">Total Value Traded</span>
+    </div>
+  </div>
+
+  <!-- ── CATEGORY CHART + TOP SELLERS ── -->
+  <div class="two-col">
+
+    <!-- Category price chart -->
+    <div class="section-card">
+      <div class="sc-title">
+        📈 Price Range by Category
+        <span>average asking price · active listings</span>
+      </div>
+      <div class="cat-row">
+        {% for cat in category_stats %}
+        <div class="cat-bar-item">
+          <div class="cat-bar-head">
+            <div class="cat-bar-name">
+              {% if cat.CategoryName=='Textbooks' %}📚
+              {% elif cat.CategoryName=='Electronics' %}📱
+              {% elif cat.CategoryName=='Furniture' %}🛋️
+              {% elif cat.CategoryName=='Clothes' %}👕
+              {% elif cat.CategoryName=='Sports' %}⚽
+              {% elif cat.CategoryName=='Appliances' %}☕
+              {% else %}📦{% endif %}
+              {{ cat.CategoryName }}
+            </div>
+            <div class="cat-bar-meta">
+              {% if cat.avg_price %}${{ cat.avg_price }} avg{% else %}No data{% endif %}
+            </div>
+          </div>
+          <div class="cat-bar-track">
+            <div class="cat-bar-fill" style="width:{{ cat.bar_pct }}%;"></div>
+          </div>
+          <div class="cat-bar-stats">
+            <span>{{ cat.active_count or 0 }} active</span>
+            {% if cat.min_price %}<span>from ${{ cat.min_price }}</span>{% endif %}
+            {% if cat.max_price %}<span>up to ${{ cat.max_price }}</span>{% endif %}
+            {% if cat.sales_count %}<span>{{ cat.sales_count }} sold</span>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Top sellers leaderboard -->
+    <div class="section-card">
+      <div class="sc-title">🏆 Top-Rated Sellers</div>
+      {% if top_sellers %}
+      <div class="seller-row">
+        {% for s in top_sellers %}
+        <div class="seller-item">
+          <div class="seller-rank seller-rank-{{ loop.index }}">#{{ loop.index }}</div>
+          <div class="seller-avatar">{{ s.Name[0] }}</div>
+          <div class="seller-info">
+            <div class="seller-name">{{ s.Name }}</div>
+            <div class="seller-meta">
+              {{ s.total_listings }} listing{{ 's' if s.total_listings != 1 }} ·
+              {{ s.review_count }} review{{ 's' if s.review_count != 1 }} ·
+              {{ s.sales_count }} sale{{ 's' if s.sales_count != 1 }}
+            </div>
+          </div>
+          <div class="seller-rating">
+            ★ {{ s.Rating or '—' }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="no-deals">No rated sellers yet.</div>
+      {% endif %}
+    </div>
+
+  </div><!-- /two-col -->
+
+  <!-- ── HOT DEALS ── -->
+  <div class="deals-section">
+    <div class="section-eyebrow">🔥 Best Deals Right Now</div>
+    <h2 class="section-title" style="margin-bottom:0;font-size:1.8rem;">
+      Listings Priced ≥ 20% Below Market Average
+    </h2>
+    {% if top_deals %}
+    <div class="deals-grid">
+      {% for d in top_deals %}
+      <a href="/listing/{{ d.ListingID }}" class="deal-card-ins">
+        <div class="deal-off">🔥 {{ d.PctBelow | int }}% below avg</div>
+        <div class="deal-ins-title">{{ d.Title }}</div>
+        <div class="deal-ins-cat">
+          {{ d.CategoryName }} · {{ d.Condition }} · {{ d.SellerName }}
+        </div>
+        <div class="deal-ins-foot">
+          <div>
+            <div class="deal-ins-price">${{ d.Price }}</div>
+            <div class="deal-ins-avg">market avg ${{ d.CatAvg }}</div>
+          </div>
+          <span class="badge badge-green" style="font-size:.68rem;">View Deal →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-deals" style="margin-top:20px;">
+      <div style="font-size:2rem;margin-bottom:10px;">📊</div>
+      <p>No listings are priced significantly below average right now.<br>
+         Check back as more students post items!</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── RECENT TRANSACTIONS ── -->
+  <div class="tx-section">
+    <div class="section-card">
+      <div class="sc-title">
+        🤝 Recent Completed Sales
+        <span>latest transactions on CampusSwap</span>
+      </div>
+      {% if recent_transactions %}
+      <div style="overflow-x:auto;">
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Category</th>
+              <th>Sold For</th>
+              <th>Payment</th>
+              <th>Buyer</th>
+              <th>Seller</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in recent_transactions %}
+            <tr>
+              <td><span class="tx-item">{{ t.ItemTitle }}</span></td>
+              <td style="color:var(--text2);font-size:.8rem;">{{ t.CategoryName }}</td>
+              <td><span class="tx-price">${{ t.FinalPrice }}</span></td>
+              <td><span class="tx-method">{{ t.PaymentMethod }}</span></td>
+              <td style="font-size:.82rem;">{{ t.BuyerName }}</td>
+              <td style="font-size:.82rem;color:var(--text2);">{{ t.SellerName }}</td>
+              <td style="font-size:.76rem;color:var(--text3);">{{ t.Date }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="no-tx">No completed transactions yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── MOST SAVED / POPULAR LISTINGS ── -->
+  <div class="tx-section" style="margin-top:0;">
+    <div class="section-card">
+      <div class="sc-title">
+        ♥ Most Saved Listings
+        <span>items students are watching most</span>
+      </div>
+      {% if most_saved %}
+      <table class="tx-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Condition</th>
+            <th>Seller</th>
+            <th style="text-align:center;">Saves</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in most_saved %}
+          <tr>
+            <td><a href="/listing/{{ item.ListingID }}"
+                   style="color:var(--accent);text-decoration:none;font-weight:600;">
+              {{ item.Title }}</a></td>
+            <td>{{ item.CategoryName }}</td>
+            <td>${{ item.Price }}</td>
+            <td>{{ item.Condition }}</td>
+            <td>{{ item.SellerName }}</td>
+            <td style="text-align:center;">
+              <span class="badge badge-green" style="font-size:.68rem;">♥ {{ item.save_count }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="no-tx">No watchlist data yet — users need to save listings first.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── SQL QUERY SHOWCASE ── -->
+  <div class="queries-section">
+    <div class="section-eyebrow">🔬 SQL Queries Behind This Page</div>
+    <h2 class="section-title" style="font-size:1.6rem;margin-bottom:24px;">
+      Key Database Queries
+    </h2>
+
+    <div class="query-block">
+      <div class="query-label">1 · Category Aggregates (GROUP BY + LEFT JOIN)</div>
+      <pre class="query-code"><span class="kw">SELECT</span> c.CategoryName,
+       <span class="fn">COUNT</span>(l.ListingID)      <span class="kw">AS</span> active_count,
+       <span class="fn">ROUND</span>(<span class="fn">AVG</span>(l.Price), 2)  <span class="kw">AS</span> avg_price,
+       <span class="fn">ROUND</span>(<span class="fn">MIN</span>(l.Price), 2)  <span class="kw">AS</span> min_price,
+       <span class="fn">ROUND</span>(<span class="fn">MAX</span>(l.Price), 2)  <span class="kw">AS</span> max_price
+<span class="kw">FROM</span> Category c
+<span class="kw">LEFT JOIN</span> Listing l <span class="kw">ON</span> c.CategoryID = l.CategoryID <span class="kw">AND</span> l.Status = <span class="fn">'active'</span>
+<span class="kw">GROUP BY</span> c.CategoryID, c.CategoryName
+<span class="kw">ORDER BY</span> avg_price <span class="kw">DESC</span>;</pre>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">2 · Hot Deals — Subquery JOIN + CASE</div>
+      <pre class="query-code"><span class="kw">SELECT</span> l.Title, l.Price,
+       <span class="fn">ROUND</span>((1 - l.Price / ca.AvgPrice) * 100, 0) <span class="kw">AS</span> PctBelow
+<span class="kw">FROM</span> Listing l
+<span class="kw">JOIN</span> (
+    <span class="kw">SELECT</span> CategoryID, <span class="fn">AVG</span>(Price) <span class="kw">AS</span> AvgPrice
+    <span class="kw">FROM</span> Listing <span class="kw">WHERE</span> Status = <span class="fn">'active'</span>
+    <span class="kw">GROUP BY</span> CategoryID
+    <span class="kw">HAVING</span> <span class="fn">AVG</span>(Price) > 0
+) ca <span class="kw">ON</span> ca.CategoryID = l.CategoryID
+<span class="kw">WHERE</span> l.Status = <span class="fn">'active'</span>
+  <span class="kw">AND</span> l.Price < ca.AvgPrice * 0.80
+<span class="kw">ORDER BY</span> PctBelow <span class="kw">DESC</span>;</pre>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">3 · Recent Sales — 5-Table JOIN</div>
+      <pre class="query-code"><span class="kw">SELECT</span> t.Date, t.FinalPrice, l.Title,
+       buyer.Name <span class="kw">AS</span> BuyerName, seller.Name <span class="kw">AS</span> SellerName
+<span class="kw">FROM</span> Transaction t
+<span class="kw">JOIN</span> Listing  l      <span class="kw">ON</span> t.ListingID  = l.ListingID
+<span class="kw">JOIN</span> Category c      <span class="kw">ON</span> l.CategoryID = c.CategoryID
+<span class="kw">JOIN</span> Student  buyer  <span class="kw">ON</span> t.BuyerID    = buyer.StudentID
+<span class="kw">JOIN</span> Student  seller <span class="kw">ON</span> t.SellerID   = seller.StudentID
+<span class="kw">ORDER BY</span> t.Date <span class="kw">DESC LIMIT</span> 8;</pre>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">4 · Top Sellers — GROUP BY + HAVING</div>
+      <pre class="query-code"><span class="kw">SELECT</span> s.Name, <span class="fn">ROUND</span>(s.Rating,1) <span class="kw">AS</span> Rating,
+       <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> r.ReviewID) <span class="kw">AS</span> review_count
+<span class="kw">FROM</span> Student s
+<span class="kw">LEFT JOIN</span> Review r <span class="kw">ON</span> s.StudentID = r.RevieweeID
+<span class="kw">GROUP BY</span> s.StudentID, s.Name, s.Rating
+<span class="kw">HAVING</span> review_count > 0
+<span class="kw">ORDER BY</span> s.Rating <span class="kw">DESC</span>;</pre>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">5 · Deal Score per Listing — CASE + Correlated Subquery</div>
+      <pre class="query-code"><span class="kw">SELECT</span> l.Title, l.Price,
+       <span class="kw">CASE</span>
+         <span class="kw">WHEN</span> l.Price < ca.AvgPrice * 0.80 <span class="kw">THEN</span> <span class="fn">'Hot'</span>
+         <span class="kw">WHEN</span> l.Price > ca.AvgPrice * 1.20 <span class="kw">THEN</span> <span class="fn">'High'</span>
+         <span class="kw">ELSE</span> <span class="fn">'Fair'</span>
+       <span class="kw">END AS</span> DealScore
+<span class="kw">FROM</span> Listing l
+<span class="kw">LEFT JOIN</span> (
+    <span class="kw">SELECT</span> CategoryID, <span class="fn">AVG</span>(Price) <span class="kw">AS</span> AvgPrice
+    <span class="kw">FROM</span> Listing <span class="kw">WHERE</span> Status = <span class="fn">'active'</span>
+    <span class="kw">GROUP BY</span> CategoryID
+) ca <span class="kw">ON</span> ca.CategoryID = l.CategoryID
+<span class="kw">WHERE</span> l.Status = <span class="fn">'active'</span>;</pre>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">6 · Most-Saved Listings — Watchlist × Listing JOIN + GROUP BY</div>
+      <pre class="query-code"><span class="kw">SELECT</span> l.Title, l.Price, c.CategoryName,
+       <span class="fn">COUNT</span>(w.WatchlistID) <span class="kw">AS</span> save_count
+<span class="kw">FROM</span> Listing l
+<span class="kw">JOIN</span> Category  c <span class="kw">ON</span> l.CategoryID = c.CategoryID
+<span class="kw">JOIN</span> Student   s <span class="kw">ON</span> l.StudentID  = s.StudentID
+<span class="kw">JOIN</span> Watchlist w <span class="kw">ON</span> l.ListingID  = w.ListingID
+<span class="kw">WHERE</span> l.Status = <span class="fn">'active'</span>
+<span class="kw">GROUP BY</span> l.ListingID, l.Title, l.Price, c.CategoryName, s.Name
+<span class="kw">ORDER BY</span> save_count <span class="kw">DESC LIMIT</span> 5;</pre>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">7 · Personalized Recommendations — Correlated Subqueries + 5-Table Query</div>
+      <pre class="query-code"><span class="kw">SELECT</span> l.Title, l.Price, c.CategoryName
+<span class="kw">FROM</span> Listing l
+<span class="kw">JOIN</span> Student s <span class="kw">ON</span> l.StudentID = s.StudentID
+<span class="kw">JOIN</span> Category c <span class="kw">ON</span> l.CategoryID = c.CategoryID
+<span class="kw">WHERE</span> l.Status = <span class="fn">'active'</span>
+  <span class="kw">AND</span> l.StudentID != :current_user
+  <span class="kw">AND</span> l.ListingID <span class="kw">NOT IN</span> (
+      <span class="kw">SELECT</span> ListingID <span class="kw">FROM</span> Watchlist
+      <span class="kw">WHERE</span> StudentID = :current_user   <span class="cm">-- exclude already-saved</span>
+  )
+  <span class="kw">AND</span> l.CategoryID <span class="kw">IN</span> (
+      <span class="kw">SELECT DISTINCT</span> l2.CategoryID    <span class="cm">-- categories user has saved</span>
+      <span class="kw">FROM</span> Watchlist w
+      <span class="kw">JOIN</span> Listing l2 <span class="kw">ON</span> w.ListingID = l2.ListingID
+      <span class="kw">WHERE</span> w.StudentID = :current_user
+  )
+<span class="kw">ORDER BY</span> DealScore <span class="kw">ASC</span>, DatePosted <span class="kw">DESC LIMIT</span> 4;</pre>
+    </div>
+
+  </div><!-- /queries-section -->
+
+</div><!-- /page-wrap -->
+
+<footer style="background:var(--bg);border-top:1px solid var(--border);padding:24px 48px;
+               display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+  <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;">
+    Campus<span style="color:var(--accent);">Swap</span>
+  </div>
+  <div style="font-size:.76rem;color:var(--text3);">
+    © 2026 CampusSwap · Sangit Gaire · Georgia State University
+  </div>
+</footer>
+
+</body>
+</html>

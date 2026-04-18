@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CampusSwap — Student Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+/* ══ HERO ══ */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items:center; justify-content:center;
+  position: relative; overflow:hidden;
+  padding: 100px 48px 80px;
+  text-align: center;
+}
+.hero-mesh {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 55%, rgba(200,245,102,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 70% at 85% 25%, rgba(123,110,246,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 45% at 55% 85%, rgba(245,166,35,.05) 0%, transparent 55%);
+  animation: meshDrift 10s ease-in-out infinite alternate;
+}
+@keyframes meshDrift {
+  from { transform:scale(1) rotate(0deg); }
+  to   { transform:scale(1.04) rotate(.8deg); }
+}
+.hero-grid {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 50%, black 40%, transparent 100%);
+}
+/* floating orbs */
+.orb {
+  position:absolute; border-radius:50%;
+  filter:blur(70px); pointer-events:none;
+  animation: orbfloat 7s ease-in-out infinite;
+}
+.orb-a { width:280px;height:280px; background:rgba(200,245,102,.06); top:8%; left:3%; }
+.orb-b { width:220px;height:220px; background:rgba(123,110,246,.07); bottom:15%;right:6%; animation-delay:2.5s; }
+.orb-c { width:160px;height:160px; background:rgba(245,166,35,.05); top:55%;left:40%; animation-delay:5s; }
+@keyframes orbfloat {
+  0%,100% { transform:translateY(0) scale(1); }
+  50%     { transform:translateY(-28px) scale(1.04); }
+}
+.hero-content { position:relative; z-index:2; max-width:820px; margin:0 auto; }
+.hero-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(200,245,102,.08); border:1px solid rgba(200,245,102,.2);
+  color:var(--accent); font-size:.75rem; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  padding:6px 18px; border-radius:99px; margin-bottom:28px;
+  animation: fadeup .8s ease both;
+}
+.pill-dot { width:6px;height:6px; background:var(--accent); border-radius:50%; animation:livepulse 1.5s infinite; }
+.hero-h1 {
+  font-family:'DM Serif Display',serif;
+  font-size: clamp(3.2rem,8vw,6rem);
+  font-weight:400; line-height:1.0; letter-spacing:-.03em;
+  margin-bottom:22px;
+  animation: fadeup .8s .1s ease both;
+}
+.hero-h1 em {
+  font-style:italic; color:var(--accent);
+  background: linear-gradient(135deg,var(--accent),#a8ff6e);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub {
+  font-size:1.05rem; color:var(--text2);
+  max-width:480px; margin:0 auto 36px;
+  line-height:1.75; font-weight:400;
+  animation: fadeup .8s .2s ease both;
+}
+.hero-actions {
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  animation: fadeup .8s .3s ease both;
+}
+.hero-stats {
+  display:flex; gap:44px; justify-content:center;
+  margin-top:64px; flex-wrap:wrap;
+  animation: fadeup .8s .4s ease both;
+}
+.hstat { text-align:center; }
+.hstat-n {
+  font-family:'DM Serif Display',serif;
+  font-size:2.2rem; color:var(--text); display:block;
+}
+.hstat-n em { font-style:normal; color:var(--accent); }
+.hstat-l { font-size:.72rem; color:var(--text2); text-transform:uppercase; letter-spacing:.1em; }
+.scroll-hint {
+  position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  color:var(--text3); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+  animation: fadeup 1s .8s ease both;
+}
+.scroll-line {
+  width:1px; height:44px;
+  background:linear-gradient(to bottom, var(--text3), transparent);
+  animation: scrollpulse 2s ease-in-out infinite;
+}
+@keyframes scrollpulse {
+  0%   { transform:scaleY(0); transform-origin:top; }
+  50%  { transform:scaleY(1); transform-origin:top; }
+  51%  { transform:scaleY(1); transform-origin:bottom; }
+  100% { transform:scaleY(0); transform-origin:bottom; }
+}
+@keyframes fadeup {
+  from { opacity:0; transform:translateY(28px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ══ SEARCH BAR ══ */
+.search-section {
+  background:var(--bg1);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:36px 48px;
+}
+.search-wrap { max-width:860px; margin:0 auto; }
+.search-bar {
+  display:flex; align-items:center;
+  background:var(--card); border:1px solid var(--border2);
+  border-radius:99px; padding:6px 6px 6px 22px;
+  transition:border-color .2s, box-shadow .2s;
+}
+.search-bar:focus-within {
+  border-color:rgba(200,245,102,.4);
+  box-shadow:0 0 0 3px rgba(200,245,102,.07);
+}
+.search-bar input {
+  flex:1; background:transparent; border:none; outline:none;
+  color:var(--text); font-family:'Instrument Sans',sans-serif;
+  font-size:.92rem; padding:6px 0;
+}
+.search-bar input::placeholder { color:var(--text3); }
+.search-bar button {
+  background:var(--accent); color:#0a0f00;
+  border:none; padding:10px 26px; border-radius:99px;
+  font-weight:700; font-size:.84rem; cursor:pointer;
+  font-family:'Instrument Sans',sans-serif;
+  transition:box-shadow .2s;
+}
+.search-bar button:hover { box-shadow:0 0 18px rgba(200,245,102,.35); }
+.pills { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+.pill-cat {
+  padding:7px 18px; border-radius:99px;
+  border:1px solid var(--border); font-size:.8rem;
+  color:var(--text2); cursor:pointer; background:transparent;
+  font-family:'Instrument Sans',sans-serif; text-decoration:none;
+  transition:all .2s;
+}
+.pill-cat:hover, .pill-cat.active {
+  background:var(--accent); color:#0a0f00;
+  border-color:var(--accent); font-weight:700;
+}
+
+/* ══ FILTER BAR ══ */
+.filter-bar {
+  display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; margin-top:16px;
+}
+.filter-select,.filter-input {
+  background:var(--card); border:1px solid var(--border2);
+  border-radius:99px; padding:7px 16px;
+  color:var(--text); font-family:'Instrument Sans',sans-serif;
+  font-size:.82rem; outline:none; cursor:pointer;
+  transition:border-color .2s;
+}
+.filter-select:focus,.filter-input:focus { border-color:rgba(200,245,102,.4); }
+.filter-input { width:90px; }
+.filter-select option { background:var(--card); }
+.filter-apply {
+  background:var(--accent); color:#0a0f00;
+  border:none; border-radius:99px; padding:7px 18px;
+  font-family:'Instrument Sans',sans-serif; font-size:.82rem;
+  font-weight:700; cursor:pointer; transition:opacity .2s;
+}
+.filter-apply:hover { opacity:.85; }
+.filter-clear {
+  color:var(--text3); font-size:.8rem; text-decoration:none;
+  padding:7px 10px; transition:color .2s;
+}
+.filter-clear:hover { color:var(--text); }
+.ft-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(123,110,246,.12); border:1px solid rgba(123,110,246,.25);
+  color:var(--accent2); border-radius:99px;
+  padding:3px 10px; font-size:.72rem; font-weight:600; margin-bottom:8px;
+}
+
+/* ══ HEART / WATCHLIST BUTTON ══ */
+.heart-btn {
+  background:rgba(255,255,255,.06); border:1px solid var(--border2);
+  border-radius:50%; width:32px; height:32px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:.95rem; flex-shrink:0;
+  transition:all .2s; text-decoration:none;
+}
+.heart-btn:hover { background:rgba(200,245,102,.12); border-color:rgba(200,245,102,.3); }
+.heart-btn.saved { background:rgba(200,245,102,.15); border-color:var(--accent); }
+
+/* ══ LISTINGS ══ */
+.listings-section { padding:72px 48px; }
+.listings-inner { max-width:1260px; margin:0 auto; }
+.listings-header {
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-bottom:36px; flex-wrap:wrap; gap:16px;
+}
+.listings-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
+  gap:20px;
+}
+/* listing card */
+.lcard {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); overflow:hidden;
+  transition:all .25s ease; cursor:pointer; text-decoration:none; color:var(--text);
+  display:block;
+}
+.lcard:hover {
+  transform:translateY(-7px);
+  border-color:rgba(200,245,102,.2);
+  box-shadow:0 24px 64px rgba(0,0,0,.45), 0 0 0 1px rgba(200,245,102,.08);
+}
+.lcard-img {
+  height:150px; display:flex; align-items:center;
+  justify-content:center; font-size:3.2rem;
+  position:relative;
+}
+.lcard-img::after {
+  content:'';
+  position:absolute; bottom:0; left:0; right:0; height:50%;
+  background:linear-gradient(to bottom,transparent,var(--card));
+}
+.lcard-body { padding:20px 22px 22px; }
+.lcard-cat {
+  font-size:.68rem; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:7px;
+}
+.lcard-title {
+  font-family:'DM Serif Display',serif;
+  font-size:1.1rem; font-weight:400; line-height:1.25;
+  margin-bottom:8px;
+}
+.lcard-desc {
+  font-size:.8rem; color:var(--text2); line-height:1.65;
+  margin-bottom:16px;
+  display:-webkit-box; -webkit-line-clamp:2;
+  -webkit-box-orient:vertical; overflow:hidden;
+}
+.lcard-foot {
+  display:flex; align-items:center; justify-content:space-between;
+}
+.lcard-price {
+  font-family:'DM Serif Display',serif;
+  font-size:1.35rem; color:var(--accent);
+}
+.lcard-seller { font-size:.75rem; color:var(--text3); margin-top:8px; }
+
+/* empty state */
+.empty {
+  grid-column:1/-1; text-align:center;
+  padding:80px 20px; color:var(--text2);
+}
+.empty-icon { font-size:3rem; margin-bottom:14px; }
+
+/* ══ TRENDING DEALS ══ */
+.trending-section {
+  background:var(--bg1);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:56px 48px;
+}
+.trending-inner { max-width:1260px; margin:0 auto; }
+.trending-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px; margin-top:32px;
+}
+.deal-card {
+  background:var(--card); border:1px solid rgba(200,245,102,.2);
+  border-radius:var(--radius-lg); padding:20px 22px;
+  text-decoration:none; color:var(--text); display:block;
+  transition:all .25s; position:relative; overflow:hidden;
+}
+.deal-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--accent),#a8ff6e);
+}
+.deal-card:hover {
+  transform:translateY(-5px);
+  box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 0 1px rgba(200,245,102,.2);
+}
+.deal-pct {
+  font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:#0a0f00; background:var(--accent);
+  display:inline-block; padding:3px 10px; border-radius:99px; margin-bottom:10px;
+}
+.deal-title { font-family:'DM Serif Display',serif; font-size:1rem; margin-bottom:6px; }
+.deal-foot { display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
+.deal-price { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--accent); }
+.deal-avg { font-size:.74rem; color:var(--text3); }
+
+/* ══ HOW IT WORKS ══ */
+.how-section {
+  background:var(--bg1);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:80px 48px;
+}
+.how-inner { max-width:1100px; margin:0 auto; }
+.how-grid {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:20px; margin-top:52px; position:relative;
+}
+.how-grid::before {
+  content:''; position:absolute; top:44px; left:12%; width:76%; height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),var(--border2),var(--border2),transparent);
+}
+.how-step {
+  display:flex; flex-direction:column; align-items:center;
+  gap:14px; padding:8px; text-align:center;
+}
+.how-icon {
+  width:88px; height:88px;
+  background:var(--card); border:1px solid var(--border2);
+  border-radius:22px; display:flex; align-items:center;
+  justify-content:center; font-size:2rem;
+  position:relative; z-index:1;
+  transition:all .3s ease;
+}
+.how-step:hover .how-icon {
+  border-color:var(--accent);
+  box-shadow:0 0 24px rgba(200,245,102,.15);
+  transform:scale(1.08);
+}
+.how-step-title {
+  font-family:'DM Serif Display',serif; font-size:1rem; font-weight:400;
+}
+.how-step-desc { font-size:.8rem; color:var(--text2); line-height:1.65; }
+
+/* ══ FOOTER ══ */
+.footer {
+  background:var(--bg); border-top:1px solid var(--border);
+  padding:32px 48px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:16px;
+}
+.footer-brand {
+  font-family:'DM Serif Display',serif; font-size:1.2rem;
+}
+.footer-brand em { font-style:normal; color:var(--accent); }
+.footer-copy { font-size:.78rem; color:var(--text3); }
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px) {
+  .hero { padding:100px 24px 70px; }
+  .search-section { padding:28px 24px; }
+  .trending-section { padding:40px 24px; }
+  .listings-section { padding:52px 24px; }
+  .how-section { padding:60px 24px; }
+  .how-grid { grid-template-columns:1fr 1fr; }
+  .how-grid::before { display:none; }
+  .footer { padding:24px; flex-direction:column; text-align:center; }
+}
+@media(max-width:600px) {
+  .hero-stats { gap:24px; }
+  .listings-header { flex-direction:column; align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="nav">
+  <a href="/" class="nav-logo">
+    <span class="nav-logo-dot"></span>
+    CampusSwap
+  </a>
+  <div class="nav-right">
+    <a href="/insights" class="btn btn-ghost btn-sm" style="font-size:.76rem;">📊 Insights</a>
+    {% if session.name %}
+      <a href="/profile" class="btn btn-ghost btn-sm">My Profile</a>
+      <a href="/post" class="btn btn-primary btn-sm">+ Post Item</a>
+    {% else %}
+      <a href="/login"    class="btn btn-ghost btn-sm">Login</a>
+      <a href="/register" class="btn btn-primary btn-sm">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-mesh"></div>
+  <div class="hero-grid"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+  <div class="hero-content">
+    <div class="hero-pill"><span class="pill-dot"></span>Verified students only</div>
+    <h1 class="hero-h1">The campus<br>marketplace <em>built for you</em></h1>
+    <p class="hero-sub">Buy and sell textbooks, electronics, furniture and more — safely, from fellow students on your campus.</p>
+    <div class="hero-actions">
+      <a href="#listings" class="btn btn-primary btn-lg">Browse Listings</a>
+      {% if session.name %}
+        <a href="/post" class="btn btn-ghost btn-lg">+ Post an Item</a>
+      {% else %}
+        <a href="/register" class="btn btn-ghost btn-lg">Get Started →</a>
+      {% endif %}
+    </div>
+    <div class="hero-stats">
+      <div class="hstat">
+        <span class="hstat-n">{{ listings|length }}<em>+</em></span>
+        <span class="hstat-l">Live Listings</span>
+      </div>
+      <div class="hstat">
+        <span class="hstat-n">6<em>+</em></span>
+        <span class="hstat-l">Categories</span>
+      </div>
+      <div class="hstat">
+        <span class="hstat-n">100<em>%</em></span>
+        <span class="hstat-l">Verified Students</span>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<section class="search-section" id="search">
+  <div class="search-wrap">
+    <form action="/search" method="GET" id="searchForm">
+      <div class="search-bar">
+        <input type="text" name="q" placeholder="Search textbooks, laptops, chairs…"
+               value="{{ query or '' }}">
+        <button type="submit">Search →</button>
+      </div>
+      <!-- Advanced filter bar (visible when searching or active filters) -->
+      <div class="filter-bar">
+        <select class="filter-select" name="sort" title="Sort by">
+          <option value="newest"    {% if sort=='newest'    %}selected{% endif %}>Newest first</option>
+          <option value="relevance" {% if sort=='relevance' %}selected{% endif %}>Most relevant</option>
+          <option value="price_asc" {% if sort=='price_asc' %}selected{% endif %}>Price: low → high</option>
+          <option value="price_desc"{% if sort=='price_desc'%}selected{% endif %}>Price: high → low</option>
+        </select>
+        <input class="filter-input" type="number" name="min_price"
+               placeholder="$ Min" min="0" value="{{ min_price or '' }}" title="Min price">
+        <input class="filter-input" type="number" name="max_price"
+               placeholder="$ Max" min="0" value="{{ max_price or '' }}" title="Max price">
+        <select class="filter-select" name="condition" title="Condition">
+          <option value="">Any condition</option>
+          <option value="Like New" {% if condition=='Like New' %}selected{% endif %}>Like New</option>
+          <option value="Good"     {% if condition=='Good'     %}selected{% endif %}>Good</option>
+          <option value="Fair"     {% if condition=='Fair'     %}selected{% endif %}>Fair</option>
+        </select>
+        <button type="submit" class="filter-apply">Apply</button>
+        {% if query or min_price or max_price or condition %}
+          <a href="/" class="filter-clear">✕ Clear all</a>
+        {% endif %}
+      </div>
+    </form>
+    <div class="pills">
+      <a href="/" class="pill-cat {% if not active_cat and not query %}active{% endif %}">All</a>
+      {% for cat in categories %}
+        <a href="/search?category={{ cat.CategoryID }}"
+           class="pill-cat {% if active_cat == cat.CategoryID|string %}active{% endif %}">
+          {% if cat.CategoryName=='Textbooks' %}📚{% elif cat.CategoryName=='Electronics' %}📱
+          {% elif cat.CategoryName=='Furniture' %}🛋️{% elif cat.CategoryName=='Clothes' %}👕
+          {% elif cat.CategoryName=='Sports' %}⚽{% elif cat.CategoryName=='Appliances' %}☕
+          {% else %}📦{% endif %}
+          {{ cat.CategoryName }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- TRENDING DEALS (only when hot deals exist) -->
+{% if trending %}
+<section class="trending-section">
+  <div class="trending-inner">
+    <div class="section-eyebrow reveal">🔥 Trending Now</div>
+    <h2 class="section-title reveal delay-1" style="margin-bottom:0;">Hot Deals Below Market Price</h2>
+    <div class="trending-grid">
+      {% for l in trending %}
+      <a href="/listing/{{ l.ListingID }}" class="deal-card reveal delay-{{ loop.index }}">
+        {% if l.CatAvg and l.CatAvg > 0 %}
+          {% set savings = ((l.CatAvg - l.Price) / l.CatAvg * 100) | round | int %}
+          <div class="deal-pct">{{ savings }}% below avg</div>
+        {% else %}
+          <div class="deal-pct">🔥 Hot Deal</div>
+        {% endif %}
+        <div class="deal-title">{{ l.Title }}</div>
+        <div style="font-size:.8rem;color:var(--text2);">{{ l.CategoryName }} · {{ l.Condition }}</div>
+        <div class="deal-foot">
+          <div class="deal-price">${{ l.Price }}</div>
+          {% if l.CatAvg %}
+            <div class="deal-avg">avg ${{ l.CatAvg }}</div>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- RECOMMENDED FOR YOU (shown only when user has watchlist history) -->
+{% if recommendations %}
+<section class="trending-section" style="background:rgba(123,110,246,.04);border-color:rgba(123,110,246,.12);">
+  <div class="trending-inner">
+    <div class="section-eyebrow reveal" style="color:var(--accent2);">✨ Personalized</div>
+    <h2 class="section-title reveal delay-1" style="margin-bottom:4px;">Recommended For You</h2>
+    <p style="color:var(--text2);font-size:.88rem;margin-bottom:28px;">
+      Based on your saved items — listings in categories you like, sorted by best deals.
+    </p>
+    <div class="trending-grid">
+      {% for l in recommendations %}
+      <a href="/listing/{{ l.ListingID }}" class="deal-card reveal delay-{{ loop.index }}"
+         style="border-color:rgba(123,110,246,.2);">
+        <div class="deal-pct"
+             style="background:var(--accent2);color:#fff;">
+          {{ l.CategoryName }}
+        </div>
+        <div class="deal-title">{{ l.Title }}</div>
+        <div style="font-size:.8rem;color:var(--text2);">{{ l.Condition }} · {{ l.SellerName }}</div>
+        <div class="deal-foot">
+          <div class="deal-price">${{ l.Price }}</div>
+          {% if l.DealScore == 'Hot' %}
+            <span class="badge badge-green" style="font-size:.65rem;">🔥 Hot Deal</span>
+          {% elif l.CatAvg %}
+            <div class="deal-avg">avg ${{ l.CatAvg }}</div>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- LISTINGS -->
+<section class="listings-section">
+  <div class="listings-inner" id="listings">
+    <div class="listings-header reveal">
+      <div>
+        <div class="section-eyebrow">Browse</div>
+        {% if used_fulltext %}
+          <div class="ft-badge">🔍 Full-text search · ranked by relevance</div>
+        {% endif %}
+        <h2 class="section-title" style="margin-bottom:0;">
+          {% if query %}{{ listings|length }} result{{ 's' if listings|length != 1 }} for "{{ query }}"
+          {% else %}Active Listings{% endif %}
+        </h2>
+      </div>
+      {% if session.name %}
+        <a href="/post" class="btn btn-primary">+ Post Item</a>
+      {% endif %}
+    </div>
+
+    <div class="listings-grid">
+      {% if listings %}
+        {% for l in listings %}
+        <div class="lcard card-hover reveal delay-{{ (loop.index0 % 4) + 1 }}" style="position:relative;">
+          <!-- Watchlist heart (only for logged-in users who aren't the seller) -->
+          {% if session.name and session.student_id != l.StudentID %}
+            {% if l.ListingID in watched_set %}
+              <form method="POST" action="/unwatch/{{ l.ListingID }}"
+                    style="position:absolute;top:10px;right:10px;z-index:10;">
+                <button type="submit" class="heart-btn saved" title="Remove from saved">♥</button>
+              </form>
+            {% else %}
+              <form method="POST" action="/watch/{{ l.ListingID }}"
+                    style="position:absolute;top:10px;right:10px;z-index:10;">
+                <button type="submit" class="heart-btn" title="Save for later">♡</button>
+              </form>
+            {% endif %}
+          {% endif %}
+          <a href="/listing/{{ l.ListingID }}" style="text-decoration:none;color:inherit;display:block;">
+          <div class="lcard-img cat-bg-{{ (loop.index % 6) + 1 }}">
+            {% if l.PrimaryImage %}
+              <img src="/static/{{ l.PrimaryImage }}" alt="{{ l.Title }}"
+                   style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+            {% elif l.CategoryName=='Textbooks' %}📚
+            {% elif l.CategoryName=='Electronics' %}📱
+            {% elif l.CategoryName=='Furniture' %}🛋️
+            {% elif l.CategoryName=='Clothes' %}👕
+            {% elif l.CategoryName=='Sports' %}⚽
+            {% elif l.CategoryName=='Appliances' %}☕
+            {% else %}📦{% endif %}
+          </div>
+          <div class="lcard-body">
+            <div class="lcard-cat">{{ l.CategoryName }}</div>
+            <div class="lcard-title">{{ l.Title }}</div>
+            <div class="lcard-desc">{{ l.Description }}</div>
+            <div class="lcard-foot">
+              <div class="lcard-price">${{ l.Price }}</div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                {% if l.DealScore == 'Hot' %}
+                  <span class="badge badge-green" style="font-size:.62rem;padding:3px 8px;">🔥 Hot Deal</span>
+                {% elif l.DealScore == 'High' %}
+                  <span class="badge badge-amber" style="font-size:.62rem;padding:3px 8px;">↑ Above Avg</span>
+                {% endif %}
+                {% if l.Condition == 'Like New' %}
+                  <span class="badge badge-green">Like New</span>
+                {% elif l.Condition == 'Good' %}
+                  <span class="badge badge-amber">Good</span>
+                {% else %}
+                  <span class="badge badge-muted">Fair</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="lcard-seller">Posted by {{ l.SellerName }} · ⭐ {{ l.SellerRating or '—' }}</div>
+          </div>
+          </a>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">
+          <div class="empty-icon">🔍</div>
+          <p>No listings found. <a href="/" style="color:var(--accent);">Clear search</a></p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="how-inner">
+    <div class="section-eyebrow reveal">How It Works</div>
+    <h2 class="section-title reveal delay-1">Simple. Safe. Student-Only.</h2>
+    <div class="how-grid">
+      <div class="how-step reveal">
+        <div class="how-icon">📝</div>
+        <div class="how-step-title">Register</div>
+        <div class="how-step-desc">Sign up with your university email to verify you are a real student.</div>
+      </div>
+      <div class="how-step reveal delay-1">
+        <div class="how-icon">📦</div>
+        <div class="how-step-title">Post a Listing</div>
+        <div class="how-step-desc">Add your item. Our Smart Price tool suggests the best price instantly.</div>
+      </div>
+      <div class="how-step reveal delay-2">
+        <div class="how-icon">💬</div>
+        <div class="how-step-title">Message & Agree</div>
+        <div class="how-step-desc">Chat directly with buyers or sellers right inside the app.</div>
+      </div>
+      <div class="how-step reveal delay-3">
+        <div class="how-icon">🤝</div>
+        <div class="how-step-title">Meet & Exchange</div>
+        <div class="how-step-desc">Meet on campus, complete the deal, and leave a review.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-brand">Campus<em>Swap</em></div>
+  <div class="footer-copy">© 2026 CampusSwap · Sangit Gaire · Georgia State University</div>
+</footer>
+
+<script>
+// Navbar scroll effect
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);
+});
+// Reveal on scroll
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
