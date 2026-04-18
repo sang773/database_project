@@ -19,7 +19,7 @@ def get_db():
     return mysql.connector.connect(
         host='localhost',
         user='root',
-        password='Sangeet@77',
+        password= #MY PASSWORD (I AM NOT PUTTING HERE)
         database='college_marketplace'
     )
 
